@@ -374,7 +374,35 @@ window.LD.App = (function () {
       // ログにパスワードタイプを付与してフィードバック画面へ渡す
       const log = window.LD.Logger.getLog();
       log.unlockType = unlockType;
-      setTimeout(() => window.LD.Feedback.show(log), 3500);
+      
+      // プレイヤーがテキストを読む時間を5秒ほど取り、その後演出を入れる
+      setTimeout(() => {
+        // 激しいグリッチと暗転演出
+        if (window.LD.Effects && window.LD.Effects.glitch) {
+          window.LD.Effects.glitch();
+          setTimeout(() => window.LD.Effects.glitch(), 300);
+          setTimeout(() => window.LD.Effects.glitch(), 600);
+        }
+        
+        // デスクトップ全体をブラックアウトさせる
+        const blackout = document.createElement('div');
+        blackout.style.position = 'fixed';
+        blackout.style.inset = '0';
+        blackout.style.backgroundColor = '#000';
+        blackout.style.zIndex = '9700';
+        blackout.style.opacity = '0';
+        blackout.style.transition = 'opacity 1.5s ease-in-out';
+        document.body.appendChild(blackout);
+
+        // 100ms後にフェードアウト開始
+        setTimeout(() => { blackout.style.opacity = '1'; }, 100);
+
+        // 完全に暗転してからフィードバック画面表示
+        setTimeout(() => {
+          window.LD.Feedback.show(log);
+        }, 1800);
+
+      }, 5500); // テキストを読む時間 (5.5秒)
     }
   }
 
