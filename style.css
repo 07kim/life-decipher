@@ -755,6 +755,55 @@ html, body {
 }
 #fb-close-btn:hover { background: linear-gradient(to bottom, #d4e4ff, #bccce0); }
 
+/* スコアバー */
+.fb-bar-wrap {
+  height: 5px;
+  background: #e8eef8;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 4px 0 6px;
+}
+.fb-bar {
+  height: 100%;
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+
+/* フラストレーションバー */
+.fb-frustration-wrap { padding: 4px 0 8px; }
+.fb-frustration-bar-bg {
+  height: 10px;
+  background: #f0e8e8;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.fb-frustration-bar {
+  height: 100%;
+  background: linear-gradient(to right, #f97316, #ef4444);
+  border-radius: 5px;
+  transition: width 0.8s ease;
+}
+.fb-frustration-label {
+  font-size: 11px;
+  color: #667;
+  line-height: 1.7;
+}
+
+/* 解読ルートバッジ */
+.fb-route-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #1158b4, #2b88e0);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(17,88,180,0.3);
+}
+
 /* ===== ユーティリティ ===== */
 .hidden { display: none !important; }
 

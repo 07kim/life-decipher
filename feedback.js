@@ -51,9 +51,8 @@ window.LD.Feedback = (function () {
     const min = Math.floor(logData.elapsedMs / 60000);
     const sec = Math.floor((logData.elapsedMs % 60000) / 1000);
     const timeStr = min > 0 ? `${min}分${sec}秒` : `${sec}秒`;
-    const audioTotal = Object.values(logData.audioReplays).reduce((a, b) => a + b, 0);
+    const audioTotal = logData.audioPlays || 0;
     const pwFail = logData.passwordAttempts.filter(a => !a.success).length;
-    const pwOk   = logData.passwordAttempts.some(a => a.success);
 
     let lines = [];
     lines.push(`総プレイ時間： ${timeStr}`);
@@ -76,8 +75,8 @@ window.LD.Feedback = (function () {
       lines.push(`黒塗り部分へのアクセスが ${logData.scrollAttempts} 回記録されました。その執重さが、答えへの扉を開きました。`);
     }
 
-    if (logData.audioPlays > 0) {
-      lines.push(`音声を合計 ${logData.audioPlays} 回再生しました。${logData.audioStops > 0 ? 'しかし途中で何度も打ち切るなど、最後まで耳を傾ける余裕はなかったようです。' : '最後まで静かに聴き入っていました。'}`);
+    if (audioTotal > 0) {
+      lines.push(`音声を合計 ${audioTotal} 回再生しました。${(logData.audioStops || 0) > 0 ? 'しかし途中で何度も打ち切るなど、最後まで耳を傾ける余裕はなかったようです。' : '最後まで静かに聴き入っていました。'}`);
     }
 
     if (logData.escCount > 0) {
@@ -85,13 +84,13 @@ window.LD.Feedback = (function () {
       lines.push(`「Escape」キーを ${logData.escCount} 回押しました。${suffix}`);
     }
 
-    const noteTotal = (logData.noteDrags.red||0) + (logData.noteDrags.yellow||0) + (logData.noteDrags.blue||0);
+    const noteDrags = logData.noteDrags || { red: 0, yellow: 0, blue: 0 };
+    const noteTotal = (noteDrags.red || 0) + (noteDrags.yellow || 0) + (noteDrags.blue || 0);
     if (noteTotal > 0) {
       let fav = 'すべて';
-      if (logData.noteDrags.red > logData.noteDrags.yellow && logData.noteDrags.red > logData.noteDrags.blue) fav = '赤い付箋（核心となるヒント）';
-      else if (logData.noteDrags.yellow > logData.noteDrags.red && logData.noteDrags.yellow > logData.noteDrags.blue) fav = '黄色い付箋（物語の断片）';
-      else if (logData.noteDrags.blue > logData.noteDrags.red && logData.noteDrags.blue > logData.noteDrags.yellow) fav = '青い付箋（システム情報）';
-      
+      if (noteDrags.red > noteDrags.yellow && noteDrags.red > noteDrags.blue) fav = '赤い付箋（核心となるヒント）';
+      else if (noteDrags.yellow > noteDrags.red && noteDrags.yellow > noteDrags.blue) fav = '黄色い付箋（物語の断片）';
+      else if (noteDrags.blue > noteDrags.red && noteDrags.blue > noteDrags.yellow) fav = '青い付箋（システム情報）';
       lines.push(`付箋を ${noteTotal} 回動かしました。特に${fav}に執着し、カオスに秩序を与えようとする傾向が見られました。`);
     }
 
@@ -101,7 +100,7 @@ window.LD.Feedback = (function () {
       else if (type === 'linguistic') lines.push(`日記に隠された縦読みの暗号に気づき、『wake』を入力。細かな言語的違和感を見逃しませんでした。`);
       else if (type === 'math') lines.push(`数列の規則性を見抜き、『1321』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
       else if (type === 'visual') lines.push(`ゲーム内のテキストではなく、「付箋のカラーコード」というメタ情報から『93c5fd』を導き出しました。極めて高いメタ思考です。`);
-      else lines.push(`隠しフォルダに ${logData.passwordAttempts.length} 回挑みましたが、まだ鍵は閉ざされています。`);
+      else lines.push(`隠しフォルダに ${pwFail} 回挑みましたが、まだ鍵は閉ざされています。`);
     }
 
     return lines.join('\n');
@@ -196,20 +195,56 @@ window.LD.Feedback = (function () {
     return map[grade] || 'grade-mid';
   }
 
+  function getRouteLabel(unlockType) {
+    const map = {
+      composite:  '🔗 複合・情報統合型',
+      linguistic: '📜 言語・暗号解読型',
+      math:       '🧠 数理・論理思考型',
+      visual:     '👁️ 視覚・メタ認知型',
+      none:       '❓ 未解決'
+    };
+    return map[unlockType || 'none'] || '❓ 未解決';
+  }
+
+  function getFrustrationText(frustration) {
+    if (frustration >= 15) return 'レベル：高　ESC連打・クリック連打・ウィンドウを閉じる行動が複数検出されました。カオスに強いストレスを感じるタイプです。';
+    if (frustration >= 5)  return 'レベル：中　数回の戸惑いや苛立ちが見られました。';
+    return 'レベル：低　落ち着いたペースで探索できていました。';
+  }
+
   return {
     show(logData) {
-      const scores   = window.LD.Assessment.calculateFinal(logData);
-      const profiles = buildProfiles(scores);
-      const narrative = buildNarrative(logData, scores);
+      // 暗転divを削除しておく（演出の残骸が残らないように）
+      document.querySelectorAll('div[style*="z-index: 9700"]').forEach(el => el.remove());
+
+      let scores;
+      try {
+        scores = window.LD.Assessment.calculateFinal(logData);
+      } catch(e) {
+        scores = { chaos: 50, openness: 30, conscientiousness: 30, planning: 30, immersion: 20, frustration: 0 };
+      }
+
+      let profiles, narrative;
+      try {
+        profiles  = buildProfiles(scores);
+        narrative = buildNarrative(logData, scores);
+      } catch(e) {
+        profiles  = [];
+        narrative = 'データ取得中にエラーが発生しました。';
+      }
 
       const screen = document.getElementById('feedback-screen');
       if (!screen) return;
+
+      const frustration = scores.frustration || 0;
+      const frustPct    = Math.min(100, Math.round(frustration));
+      const unlockType  = logData.unlockType || 'none';
 
       screen.innerHTML = `
         <div id="fb-wrap">
           <div id="fb-header">
             <div id="fb-logo">LIFE DECIPHER</div>
-            <div id="fb-subtitle">— Assessment Report —</div>
+            <div id="fb-subtitle">— Behavioral Assessment Report —</div>
           </div>
 
           <div id="fb-body">
@@ -228,6 +263,7 @@ window.LD.Feedback = (function () {
                         <span class="fb-grade ${buildGradeClass(p.grade)}">${p.grade}</span>
                         <span class="fb-score-val">${Math.round(p.score)}</span>
                       </div>
+                      <div class="fb-bar-wrap"><div class="fb-bar" style="width:${Math.round(p.score)}%"></div></div>
                       <div class="fb-profile-desc">${p.desc}</div>
                     </div>
                   `).join('')}
@@ -237,8 +273,25 @@ window.LD.Feedback = (function () {
 
             <div id="fb-right">
               <section class="fb-section">
-                <h2 class="fb-section-title">▎ 5軸分析</h2>
+                <h2 class="fb-section-title">▎ 5軸分析レーダー</h2>
                 <canvas id="radar-canvas" width="300" height="300"></canvas>
+              </section>
+
+              <section class="fb-section">
+                <h2 class="fb-section-title">▎ ストレス・苛立ち指数</h2>
+                <div class="fb-frustration-wrap">
+                  <div class="fb-frustration-bar-bg">
+                    <div class="fb-frustration-bar" style="width:${frustPct}%"></div>
+                  </div>
+                  <div class="fb-frustration-label">${getFrustrationText(frustration)}</div>
+                </div>
+              </section>
+
+              <section class="fb-section">
+                <h2 class="fb-section-title">▎ 解読ルート</h2>
+                <div class="fb-route-badge">
+                  ${getRouteLabel(unlockType)}
+                </div>
               </section>
             </div>
           </div>
@@ -261,10 +314,11 @@ window.LD.Feedback = (function () {
         const canvas = document.getElementById('radar-canvas');
         if (canvas) drawRadar(canvas, scores);
 
-        document.getElementById('fb-close-btn').addEventListener('click', () => {
+        const closeBtn = document.getElementById('fb-close-btn');
+        if (closeBtn) closeBtn.addEventListener('click', () => {
           screen.classList.add('hidden');
         });
-      }, 120);
+      }, 150);
     }
   };
 })();
