@@ -52,10 +52,11 @@ window.LD.Assessment = (function () {
       }
 
       // 2. 付箋のドラッグ分析
-      const redDrags = logData.noteDrags.red || 0;
-      const yellowDrags = logData.noteDrags.yellow || 0;
-      const blueDrags = logData.noteDrags.blue || 0;
-      const kangoDrags = logData.noteDrags.kango || 0; // 仮に青付箋として扱うが後で拡張可能
+      const redDrags    = logData.noteDrags.red    || 0;
+      const yellowDrags = logData.noteDrags.yellow  || 0;
+      const blueDrags   = logData.noteDrags.blue    || 0;
+      const greenDrags  = logData.noteDrags.green   || 0;
+      const kangoDrags  = logData.noteDrags.kango   || 0;
 
       // カオス耐性（連打・ESC回避、無意味な探索の少なさ）
       const rawChaos = 100
@@ -73,11 +74,12 @@ window.LD.Assessment = (function () {
         + pwAttempts              * 2
       );
 
-      // 系統的探索（順序読解、整理された行動）
+      // 系統的探索（順序読解、整理された行動、日記時系列整理）
       scores.conscientiousness = Math.min(100,
         20
         + logData.audioCompletes * 8
         + sequentialDiaryReads   * 5
+        + (logData.diaryChronological ? 25 : 0)
       );
 
       // 論理・数理思考（math突破、計算メモ）
@@ -87,11 +89,12 @@ window.LD.Assessment = (function () {
         + (logData.passwordAttempts.some(a => /\d/.test(a.val)) ? 15 : 0)
       );
 
-      // 空間・視覚認知（visual突破、blue付箋操作）
+      // 空間・視覚認知（visual突破、blue付箋操作、色グループ配置）
       scores.spatial = Math.min(100,
         20
         + blueDrags * 3
         + (unlockType === 'visual' ? 60 : 0)
+        + (logData.sameColorArrangement ? 10 : 0)
       );
 
       // 言語・文脈理解（linguistic突破、赤付箋操作、日記熟読）
@@ -102,12 +105,13 @@ window.LD.Assessment = (function () {
         + (unlockType === 'linguistic' ? 60 : 0)
       );
 
-      // 情報統合力（composite突破、複数の付箋の整理）
+      // 情報統合力（composite突破、複数の付箋の整理、色グループ配置）
       const bruteForcePenalty = pwAttempts > 5 && unlockType !== 'composite' ? 20 : 0;
       scores.integration = Math.min(100,
         20
-        + (yellowDrags + redDrags + blueDrags) * 2
+        + (yellowDrags + redDrags + blueDrags + greenDrags) * 2
         + (unlockType === 'composite' ? 60 : 0)
+        + (logData.tricolorArrangement  ? 15 : 0)
         - bruteForcePenalty
       );
 

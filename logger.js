@@ -13,7 +13,9 @@ window.LD.Logger = (function () {
     audioPlays: 0,
     passwordAttempts: [], // { pass: string, success: bool }
     // 新アセスメント指標
-    noteDrags: { red: 0, yellow: 0, blue: 0 },
+    noteDrags: { red: 0, yellow: 0, blue: 0, green: 0 },
+    sameColorArrangement: false,
+    tricolorArrangement: false,
     diaryReads: [], // 開いた順序の記録
     audioStops: 0,
     audioCompletes: 0,
@@ -27,7 +29,10 @@ window.LD.Logger = (function () {
     windowCloseCount: 0,
     maxIdleTime: 0,
     folderCreated: false,
-    fileOpenOrder: []
+    fileOpenOrder: [],
+    diaryReorderCount: 0,
+    diaryChronological: false,
+    browserSearches: []
   };
 
   let lastClickTime = 0;
@@ -177,6 +182,33 @@ window.LD.Logger = (function () {
       if (type && log.noteDrags[type] !== undefined) {
         log.noteDrags[type]++;
       }
+    },
+
+    logDiaryReorder() {
+      log.diaryReorderCount++;
+      window.LD.Assessment && window.LD.Assessment.update('conscientiousness', 1);
+    },
+
+    logDiaryChronological() {
+      log.diaryChronological = true;
+      window.LD.Assessment && window.LD.Assessment.update('conscientiousness', 20);
+    },
+
+    logBrowserSearch(q) {
+      log.browserSearches.push({ q, time: Date.now() - log.sessionStart });
+      window.LD.Assessment && window.LD.Assessment.update('openness', 1);
+    },
+
+    logSameColorArrangement() {
+      log.sameColorArrangement = true;
+      window.LD.Assessment && window.LD.Assessment.update('spatial', 10);
+      window.LD.Assessment && window.LD.Assessment.update('openness', 5);
+    },
+
+    logTricolorArrangement() {
+      log.tricolorArrangement = true;
+      window.LD.Assessment && window.LD.Assessment.update('integration', 15);
+      window.LD.Assessment && window.LD.Assessment.update('spatial', 5);
     },
 
     logPasswordAttempt(pass, success) {

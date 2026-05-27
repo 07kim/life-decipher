@@ -29,12 +29,24 @@ window.LD.STICKY_NOTES = [
   {
     id: 'note3',
     type: 'red',
+    colorGroup: 'red',
     text: '①\n鍵は3つ。\n全ての断片を\n集めよ。',
     color: '#fca5a5',
     shadowColor: 'rgba(180,50,50,0.2)',
     x: 680,
     y: 75,
     rotation: 2.2
+  },
+  {
+    id: 'note-r2',
+    type: 'red',
+    colorGroup: 'red',
+    text: '赤は\nはじまりの色\n——それとも終わり?',
+    color: '#fecaca',
+    shadowColor: 'rgba(180,50,50,0.15)',
+    x: 740,
+    y: 220,
+    rotation: -1.8
   },
 
   // ━━ 数理ルート（3455）へのヒント Step1 ━━
@@ -47,6 +59,54 @@ window.LD.STICKY_NOTES = [
     x: 820,
     y: 340,
     rotation: -2.1
+  },
+
+  // ━━ 緑付箋（色グループ配置ギミック用） ━━
+  {
+    id: 'note-g1',
+    type: 'green',
+    colorGroup: 'green',
+    text: '②\n混ざれば\n新しい何かに\nなる',
+    color: '#86efac',
+    shadowColor: 'rgba(50,160,80,0.2)',
+    x: 500,
+    y: 155,
+    rotation: 1.3
+  },
+  {
+    id: 'note-g2',
+    type: 'green',
+    colorGroup: 'green',
+    text: '分けるか\n混ぜるか\nそれが問いだ',
+    color: '#bbf7d0',
+    shadowColor: 'rgba(50,160,80,0.15)',
+    x: 330,
+    y: 400,
+    rotation: -2.2
+  },
+
+  // ━━ 青付箋（色グループ配置ギミック用、勘合符とは別） ━━
+  {
+    id: 'note-b1',
+    type: 'blue',
+    colorGroup: 'blue',
+    text: '③\n青は静かに\n全てを映す',
+    color: '#93c5fd',
+    shadowColor: 'rgba(50,100,180,0.2)',
+    x: 190,
+    y: 230,
+    rotation: 2.6
+  },
+  {
+    id: 'note-b2',
+    type: 'blue',
+    colorGroup: 'blue',
+    text: '深く潜れば\n答えが見える',
+    color: '#bfdbfe',
+    shadowColor: 'rgba(50,100,180,0.15)',
+    x: 560,
+    y: 380,
+    rotation: -0.9
   },
 
   // ━━ 空間・視覚ルート（勘合符パズル） ━━

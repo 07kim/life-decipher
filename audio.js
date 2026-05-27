@@ -77,6 +77,31 @@ window.LD.Audio = (function () {
     isPlaying = false;
   }
 
+  function startAmbient() {
+    const ctx = getCtx();
+    const sr  = ctx.sampleRate;
+    const buf = ctx.createBuffer(1, sr * 4, sr);
+    const d   = buf.getChannelData(0);
+    let last  = 0;
+    for (let i = 0; i < d.length; i++) {
+      const w = Math.random() * 2 - 1;
+      d[i]    = (last + 0.02 * w) / 1.02;
+      last    = d[i];
+      d[i]   *= 3.5;
+    }
+    const src  = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop   = true;
+    const lpf  = ctx.createBiquadFilter();
+    lpf.type   = 'lowpass';
+    lpf.frequency.value = 160;
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    src.connect(lpf); lpf.connect(gain); gain.connect(ctx.destination);
+    src.start();
+    gain.gain.linearRampToValueAtTime(0.055, ctx.currentTime + 4);
+  }
+
   return {
     play(memoConfig, onProgress, onEnd) {
       stopCurrent();
@@ -128,11 +153,10 @@ window.LD.Audio = (function () {
         onEnd && onEnd();
         currentSource = null;
       };
-
-      window.LD.Logger && window.LD.Logger.logAudioReplay(memoConfig.id);
     },
 
     stop: stopCurrent,
+    startAmbient,
     isPlaying() { return isPlaying; }
   };
 })();

@@ -163,6 +163,7 @@ html, body {
   user-select: none;
   transition: transform 0.1s ease, box-shadow 0.2s ease;
   overflow: hidden; /* 勘合文字がはみ出さないように */
+  pointer-events: auto;
 }
 .sticky:active { cursor: grabbing; box-shadow: 5px 8px 15px rgba(0,0,0,0.3) !important; z-index: 9999 !important; }
 
@@ -299,6 +300,20 @@ html, body {
 }
 .dtab:hover     { background: #e0e8f4; }
 .dtab.dtab-active { background: #fff; border-color: #7090c0; color: #224; font-weight: 700; }
+
+/* 日記タブ ドラッグ並び替え */
+.dtab[draggable="true"] { cursor: grab; }
+.dtab.dtab-dragging { opacity: 0.35; cursor: grabbing !important; }
+.dtab.dtab-dragover {
+  background: #ddeeff;
+  border-color: #3b82f6;
+  box-shadow: inset -3px 0 0 #3b82f6;
+}
+@keyframes chronoglow {
+  0%, 100% { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  50%       { background: #a7f3d0; border-color: #059669; color: #065f46; }
+}
+.dtab.dtab-chrono { animation: chronoglow 0.6s ease-in-out 4; }
 
 .diary-pane {
   flex: 1;
@@ -444,6 +459,14 @@ html, body {
   color: #334;
   white-space: pre-wrap;
   word-break: break-word;
+  user-select: text;
+  cursor: text;
+}
+
+/* テキスト選択を許可するコンテンツ領域 */
+.diary-body, .browser-content, .bw-art-body, .bw-code, .bw-result-desc {
+  user-select: text;
+  cursor: text;
 }
 
 /* ===== ゴミ箱 ===== */
@@ -862,3 +885,175 @@ html, body {
 }
 .icon-glow { animation: glowIcon 3s ease-out; border-radius: 4px; }
 .pw-label { font-size: 12px; color: #aab; margin-bottom: 8px; font-family: var(--font-mono); }
+
+/* ===== ブート画面 ===== */
+#boot-screen {
+  position: fixed;
+  inset: 0;
+  background: #000d1f;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#boot-screen.boot-fadeout {
+  animation: bootfade 1.0s ease-in forwards;
+  pointer-events: none;
+}
+@keyframes bootfade { to { opacity: 0; } }
+
+#boot-inner {
+  text-align: center;
+  user-select: none;
+}
+
+#boot-logo-text {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 10px;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(59,130,246,0.6);
+  font-family: 'Noto Sans JP', sans-serif;
+}
+#boot-logo-accent { color: #3b82f6; }
+
+#boot-version {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  margin-top: 6px;
+  font-family: 'Courier New', monospace;
+}
+
+#boot-bar-wrap {
+  width: 220px;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 36px auto 12px;
+}
+#boot-bar-inner {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #1d4ed8, #3b82f6);
+  border-radius: 2px;
+  transition: width 0.12s linear;
+}
+
+#boot-status {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  min-height: 1em;
+}
+
+/* ===== コンテキストメニュー ===== */
+#ctx-menu {
+  position: fixed;
+  background: #f0f0f0;
+  border: 1px solid #9ab;
+  border-radius: 3px;
+  box-shadow: 3px 4px 12px rgba(0,0,0,0.35);
+  z-index: 9100;
+  min-width: 180px;
+  padding: 3px 0;
+  user-select: none;
+}
+#ctx-menu.hidden { display: none; }
+
+.ctx-item {
+  padding: 5px 22px;
+  font-size: 12px;
+  color: #334;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+.ctx-item:hover { background: #3375d6; color: #fff; }
+.ctx-item.ctx-disabled { color: #aaa; cursor: default; pointer-events: none; }
+.ctx-sep {
+  height: 1px;
+  background: #c0c8d8;
+  margin: 3px 6px;
+}
+
+/* ===== フィードバック リプレイボタン ===== */
+#fb-replay-btn {
+  padding: 8px 28px;
+  background: linear-gradient(to bottom, #1d4ed8, #1558c4);
+  border: 1px solid #1a4cb0;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  color: #fff;
+  margin-right: 10px;
+  transition: background 0.15s;
+}
+#fb-replay-btn:hover { background: linear-gradient(to bottom, #2563eb, #1d4ed8); }
+
+/* ===== ゲーム内ブラウザ (InternetX) ===== */
+.browser-wrap { display: flex; flex-direction: column; height: 100%; }
+
+.browser-toolbar {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 8px; flex-shrink: 0;
+  background: linear-gradient(to bottom, #e8eef8, #d8e4f0);
+  border-bottom: 1px solid #b0bcd0;
+}
+.bw-btn {
+  padding: 2px 8px; border: 1px solid #9ab; border-radius: 3px; flex-shrink: 0;
+  background: linear-gradient(to bottom, #e8f0ff, #d4dcf0);
+  font-size: 11px; cursor: pointer; color: #224;
+}
+.bw-btn:hover { background: linear-gradient(to bottom, #d8e8ff, #c4ccee); }
+.bw-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+.bw-url {
+  flex: 1; padding: 3px 8px; border: 1px solid #9ab; border-radius: 2px;
+  font-size: 11px; font-family: monospace; background: #fff; color: #334; outline: none;
+}
+.bw-url:focus { border-color: #3b82f6; }
+.browser-content { flex: 1; overflow-y: auto; padding: 14px 18px; background: #fff; font-size: 12px; line-height: 1.8; }
+
+/* ホームページ */
+.bw-logo { font-size: 26px; font-weight: 700; letter-spacing: 4px; color: #1158b4; margin-bottom: 18px; margin-top: 24px; text-align: center; }
+.bw-search-bar { display: flex; max-width: 400px; margin: 0 auto 20px; gap: 6px; }
+.bw-sq-input {
+  flex: 1; padding: 6px 10px; border: 1px solid #9ab; border-radius: 3px;
+  font-size: 12px; font-family: monospace; outline: none;
+}
+.bw-sq-input:focus { border-color: #3b82f6; }
+.bw-sq-btn {
+  padding: 6px 14px; background: #1158b4; color: #fff; border: none; border-radius: 3px;
+  cursor: pointer; font-size: 12px; font-family: var(--font-ui);
+}
+.bw-sq-btn:hover { background: #2b88e0; }
+.bw-favs { max-width: 400px; margin: 0 auto; }
+.bw-fav-hd { font-size: 10px; color: #aaa; padding-bottom: 6px; border-bottom: 1px solid #eee; margin-bottom: 6px; }
+.bw-fav-link { font-size: 12px; color: #1158b4; cursor: pointer; padding: 2px 0; text-decoration: underline; }
+.bw-fav-link:hover { color: #2b88e0; }
+
+/* 検索結果 */
+.bw-query { font-size: 11px; color: #888; margin-bottom: 12px; }
+.bw-result { margin-bottom: 16px; }
+.bw-result-title { font-size: 14px; color: #1158b4; cursor: pointer; text-decoration: underline; }
+.bw-result-title:hover { color: #2b88e0; }
+.bw-result-url { font-size: 10px; color: #2d8a2d; font-family: monospace; margin: 2px 0 3px; }
+.bw-result-desc { font-size: 12px; color: #444; }
+.bw-no-result { color: #888; font-size: 12px; }
+
+/* 記事ページ */
+.bw-art-title { font-size: 17px; font-weight: 700; color: #224; margin-bottom: 3px; }
+.bw-art-meta  { font-size: 10px; color: #aaa; font-family: monospace; margin-bottom: 14px; }
+.bw-art-body  { font-size: 12px; line-height: 2; color: #334; }
+.bw-art-body h3 { font-size: 13px; font-weight: 700; color: #224; margin: 14px 0 6px; border-left: 3px solid #3b82f6; padding-left: 8px; }
+.bw-art-body p  { margin-bottom: 8px; }
+.bw-art-body ul { padding-left: 20px; margin-bottom: 8px; }
+.bw-code { font-family: monospace; background: #f4f4ff; padding: 1px 5px; border-radius: 2px; font-size: 11px; border: 1px solid #e0e4ff; }
+.bw-swatch { display: inline-block; width: 14px; height: 14px; border: 1px solid #ccc; border-radius: 2px; vertical-align: middle; }
+.bw-table { border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+.bw-table th, .bw-table td { padding: 5px 14px; border: 1px solid #dde; text-align: left; }
+.bw-table th { background: #f0f4ff; color: #446; font-size: 11px; }
+.bw-404 { color: #888; font-family: monospace; padding: 10px 0; }

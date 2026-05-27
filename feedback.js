@@ -114,7 +114,7 @@ window.LD.Feedback = (function () {
       if (type === 'composite') lines.push(`散らばった複数の情報を正しく組み合わせ、『3key5』を導き出し真相へ到達しました。`);
       else if (type === 'linguistic') lines.push(`日記に隠された縦読みの暗号に気づき、『wake』を入力。細かな言語的違和感を見逃しませんでした。`);
       else if (type === 'math') lines.push(`数列の規則性を見抜き、『3455』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
-      else if (type === 'visual') lines.push(`画面上に散らばった付箋の「端」を繋ぎ合わせ、『void』という隠された文字を浮かび上がらせました。極めて高い空間・視覚的認知能力です。`);
+      else if (type === 'visual') lines.push(`付箋の番号順に並んだカラーコードの末尾を繋ぎ合わせ、『a5acfd』を導き出しました。ゲームの枠外からシステムを俯瞰する、極めて高いメタ認知能力の証明です。`);
       else lines.push(`隠しフォルダに ${pwFail} 回挑みましたが、まだ鍵は閉ざされています。`);
     }
 
@@ -332,6 +332,7 @@ window.LD.Feedback = (function () {
           </div>
 
           <div id="fb-footer">
+            <button id="fb-replay-btn">もう一度プレイ</button>
             <button id="fb-close-btn">画面を閉じる</button>
           </div>
         </div>
@@ -347,6 +348,9 @@ window.LD.Feedback = (function () {
         if (closeBtn) closeBtn.addEventListener('click', () => {
           screen.classList.add('hidden');
         });
+
+        const replayBtn = document.getElementById('fb-replay-btn');
+        if (replayBtn) replayBtn.addEventListener('click', () => location.reload());
       }, 150);
     }
   };
