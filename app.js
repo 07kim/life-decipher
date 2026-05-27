@@ -163,7 +163,8 @@ window.LD.App = (function () {
       { id: 'diary-txt',     label: '日記.txt',         emoji: '📝', x: 32,     y: 32,        action: openDiary },
       { id: 'voice-memos',   label: 'ボイスメモ',         emoji: '📁', x: 32,     y: 148,       action: openVoiceMemos },
       { id: 'sketchbook',    label: 'InternetX.exe',      emoji: '🌐', x: 32,     y: 264,       action: openBrowser },
-      { id: 'calc-memo',     label: '計算メモ.txt',       emoji: '📊', x: 32,     y: 380,       action: openCalcMemo },
+      { id: 'calc-memo',          label: '計算メモ.txt',    emoji: '📊', x: 32,     y: 380,       action: openCalcMemo },
+      { id: 'investigation-memo', label: '調査メモ.exe',   emoji: '📋', x: 32,     y: 496,       action: openInvestigationMemo },
       { id: 'recycle-bin',   label: 'ゴミ箱',             emoji: '🗑️', x: W - 90, y: 32,        action: openRecycleBin },
       { id: 'hidden-folder', label: '隠しフォルダ',       emoji: '🔒', x: W - 90, y: H - 170,   action: () => openPasswordModal('hidden-folder') },
       { id: 'analysis-report', label: '分析レポート.pdf', emoji: '📊', x: W - 90, y: 148, action: () => window.LD.Feedback.show(window.LD.Logger.getLog(), true), hidden: true }
@@ -970,6 +971,119 @@ Checksum : 0x████████
       ████████████████████████`;
       const h2 = `<div class="txt-wrap"><pre class="txt-body">${escapeHtml(content)}</pre></div>`;
       createWindow('deleted-fragment', 'deleted_fragment_0█.txt', h2, { width: 420, height: 300, x: 200, y: 130 });
+    });
+  }
+
+  // =====================================================
+  // 調査メモ（手がかりコレクター）
+  // =====================================================
+  function openInvestigationMemo(pos) {
+    window.LD.Logger.logFileOpen('investigation-memo', '調査メモ.exe');
+    destroyWindow('investigation-memo');
+
+    const log    = window.LD.Logger.getLog();
+    const opened = log.totalFilesOpened;
+
+    function ent(label, value) {
+      if (!value && value !== 0) return '';
+      return `<div class="inv-entry"><span class="inv-lbl">${label}</span><span class="inv-val">${value}</span></div>`;
+    }
+
+    function sec(emoji, title, rows, unlocked, hint) {
+      const body = rows.filter(Boolean).join('');
+      if (!unlocked) return `
+        <div class="inv-section inv-locked">
+          <div class="inv-stitle">${emoji} ${title}</div>
+          <div class="inv-hint">${hint}</div>
+        </div>`;
+      return `
+        <div class="inv-section">
+          <div class="inv-stitle">${emoji} ${title}</div>
+          ${body}
+        </div>`;
+    }
+
+    const diaryCount   = log.diaryReads.length;
+    const pwAttempts   = log.passwordAttempts.length;
+    const calcOpened   = opened.has('calc-memo');
+    const browserUsed  = opened.has('sketchbook');
+    const audioPlayed  = log.audioPlays > 0;
+    const folderOpened = opened.has('hidden-folder');
+    const colorKnown   = log.sameColorArrangement;
+
+    // ── 数列 ──
+    const numSec = sec('🔢', '数列の観察', [
+      ent('パターン', '1, 1, 2, 3, 5, 8, 13, 21…'),
+      ent('続き',     '<code>34</code>, <code>55</code>'),
+      ent('候補',     '<code>3455</code> ?'),
+    ], calcOpened, '計算メモを開いてみると…');
+
+    // ── 色 ──
+    const colorSec = sec('🎨', '色彩の記録', [
+      colorKnown
+        ? ent('赤の末尾', '<code>a5</code>')
+        : ent('状態', '<em>付箋を色ごとにまとめてみると…</em>'),
+      colorKnown ? ent('緑の末尾', '<code>ac</code>') : '',
+      colorKnown ? ent('青の末尾', '<code>fd</code>') : '',
+      colorKnown ? ent('連結',     '<code style="font-size:13px;background:#dbeafe;border-color:#93c5fd;">a5acfd</code>') : '',
+    ], browserUsed || colorKnown, 'InternetXを起動すると…');
+
+    // ── 日記 ──
+    const diarySec = sec('📖', '記憶の断片', [
+      ent('閲覧数', `${diaryCount} / 11 件`),
+      log.diaryChronological
+        ? ent('整理', '時系列順 ✓')
+        : ent('整理', '<em>時系列順に並べると…?</em>'),
+      log.diaryChronological
+        ? ent('付記', '<em>「尻尾を繋げよ」</em>')
+        : '',
+    ], diaryCount >= 3, '日記をもう少し読んでみると…');
+
+    // ── 音声 ──
+    const audioSec = sec('🔊', '音の痕跡', [
+      ent('再生数', `${log.audioPlays} 回`),
+      ent('完聴数', `${log.audioCompletes} 件`),
+      log.audioCompletes >= 2
+        ? ent('気づき', '<em>繰り返される言葉がある</em>')
+        : '',
+    ], audioPlayed, '音声メモを再生してみると…');
+
+    // ── 鍵 ──
+    const lastAttempts = log.passwordAttempts.slice(-4).reverse();
+    const keySec = sec('🔑', '鍵の候補', [
+      ent('試行', `${pwAttempts} 回`),
+      ...lastAttempts.map(a =>
+        ent(a.success ? '✓ 成功' : '✗', `<code>${escapeHtml(a.pass.slice(0, 16))}</code>`)
+      ),
+    ], pwAttempts > 0 || folderOpened, 'もっと情報を集めてから…');
+
+    // 全解禁チェック
+    const allUnlocked = calcOpened && (browserUsed || colorKnown) && diaryCount >= 3 && audioPlayed && (pwAttempts > 0 || folderOpened);
+    const completeBanner = allUnlocked
+      ? `<div class="inv-complete">全ての手がかりを集めた——<br>後は繋ぎ合わせるだけだ。</div>`
+      : '';
+
+    const html = `
+      <div class="inv-wrap">
+        <div class="inv-header">
+          <span>📋 調査ノート</span>
+          <button class="inv-refresh" id="inv-refresh">↺ 更新</button>
+        </div>
+        ${numSec}${colorSec}${diarySec}${audioSec}${keySec}
+        ${completeBanner}
+      </div>
+    `;
+
+    const x = pos ? pos.x : 140;
+    const y = pos ? pos.y : 65;
+    const win = createWindow('investigation-memo', '調査メモ.exe', html, { width: 380, height: 510, x, y });
+    if (!win) return;
+
+    win.querySelector('#inv-refresh').addEventListener('click', () => {
+      const curX = parseInt(win.style.left) || x;
+      const curY = parseInt(win.style.top)  || y;
+      destroyWindow('investigation-memo');
+      openInvestigationMemo({ x: curX, y: curY });
     });
   }
 

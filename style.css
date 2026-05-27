@@ -1057,3 +1057,104 @@ html, body {
 .bw-table th, .bw-table td { padding: 5px 14px; border: 1px solid #dde; text-align: left; }
 .bw-table th { background: #f0f4ff; color: #446; font-size: 11px; }
 .bw-404 { color: #888; font-family: monospace; padding: 10px 0; }
+
+/* ===== 調査メモ (Investigation Memo) ===== */
+.inv-wrap {
+  padding: 14px 16px;
+  height: 100%;
+  overflow-y: auto;
+  background: #fafaf8;
+  font-size: 12px;
+  color: #334;
+}
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #334;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #334;
+  font-family: var(--font-mono);
+}
+
+.inv-refresh {
+  font-size: 10px;
+  padding: 2px 9px;
+  background: #eee;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #555;
+  font-family: var(--font-ui);
+}
+.inv-refresh:hover { background: #dde; color: #224; }
+
+.inv-section {
+  margin-bottom: 10px;
+  padding: 8px 10px 8px 12px;
+  border-left: 3px solid #3b82f6;
+  background: #fff;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.inv-section.inv-locked {
+  border-left-color: #ddd;
+  background: #f5f5f3;
+}
+
+.inv-stitle {
+  font-weight: 700;
+  font-size: 12px;
+  color: #334;
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+}
+.inv-locked .inv-stitle { color: #aaa; }
+
+.inv-entry {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.9;
+  align-items: baseline;
+}
+.inv-lbl {
+  flex-shrink: 0;
+  width: 68px;
+  color: #999;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.inv-val { color: #334; }
+.inv-val code {
+  background: #f0f4ff;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 12px;
+  border: 1px solid #dde;
+  font-family: var(--font-mono);
+  user-select: text;
+}
+.inv-val em { color: #888; font-style: italic; font-size: 11px; }
+
+.inv-hint {
+  font-size: 11px;
+  color: #ccc;
+  font-style: italic;
+}
+
+.inv-complete {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #fce8e8, #e8fced, #e8f0fe);
+  border-radius: 4px;
+  font-size: 11px;
+  color: #446;
+  text-align: center;
+  font-family: var(--font-mono);
+  border: 1px solid #e0e4f0;
+}
