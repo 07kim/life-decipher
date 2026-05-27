@@ -1,0 +1,764 @@
+/* ===================================================
+   Life Decipher — スタイルシート
+   Windows XP 風ライトモード + 不穏な質感
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* ===== リセット & 基盤 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --desktop-bg:   #3a6da8;
+  --bar-h:        36px;
+  --title-grad1:  #1158b4;
+  --title-grad2:  #2b88e0;
+  --title-text:   #fff;
+  --win-border:   #1a4e9c;
+  --win-bg:       #f0f0f0;
+  --win-body-bg:  #ffffff;
+  --taskbar-bg1:  #1358c4;
+  --taskbar-bg2:  #3a8ae4;
+  --font-ui:      'Noto Sans JP', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  --font-mono:    'Courier New', 'Osaka-Mono', monospace;
+  --shadow-win:   4px 4px 16px rgba(0,0,20,0.45);
+  --censored-bg:  #111;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  user-select: none;
+  cursor: default;
+}
+
+/* ===== デスクトップ ===== */
+#desktop {
+  position: fixed;
+  inset: 0 0 var(--bar-h) 0;
+  background: linear-gradient(160deg, #3a6da8 0%, #2c5699 50%, #1d3f7a 100%);
+  overflow: hidden;
+}
+
+/* XP風ノイズテクスチャ */
+#desktop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='rgba(255,255,255,0.04)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ===== グリッチアニメーション ===== */
+@keyframes glitch-h {
+  0%   { clip-path: inset(0 0 98% 0); transform: translateX(-4px); }
+  20%  { clip-path: inset(40% 0 50% 0); transform: translateX(4px); }
+  40%  { clip-path: inset(70% 0 20% 0); transform: translateX(-3px); }
+  60%  { clip-path: inset(10% 0 80% 0); transform: translateX(6px); }
+  80%  { clip-path: inset(90% 0 0 0);   transform: translateX(-2px); }
+  100% { clip-path: inset(0 0 98% 0);   transform: translateX(0); }
+}
+
+#desktop.glitching::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  animation: glitch-h 0.08s steps(1) infinite;
+  opacity: 0.7;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  z-index: 9000;
+}
+
+/* ノイズオーバーレイ（Canvas） */
+#noise-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+  z-index: 9001;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+
+/* ===== デスクトップアイコン ===== */
+#desktop-icons {
+  position: absolute;
+  inset: 0;
+}
+
+.desktop-icon {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 72px;
+  padding: 6px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.desktop-icon:hover { background: rgba(255,255,255,0.18); }
+.desktop-icon.icon-sel { background: rgba(255,255,255,0.28); }
+
+.icon-img {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.4));
+  transition: transform 0.15s;
+}
+.desktop-icon:hover .icon-img { transform: scale(1.08); }
+
+.icon-lbl {
+  margin-top: 5px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.8), -1px -1px 3px rgba(0,0,0,0.6);
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+/* 隠しフォルダの「光る」状態 */
+.desktop-icon.icon-glow .icon-img {
+  filter: drop-shadow(0 0 8px rgba(255,150,150,0.9));
+  animation: icon-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes icon-pulse {
+  from { filter: drop-shadow(0 0 5px rgba(255,120,120,0.7)); }
+  to   { filter: drop-shadow(0 0 14px rgba(255,80,80,1)); }
+}
+
+/* ===== 付箋エリア ===== */
+#sticky-area {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sticky {
+  position: absolute;
+  pointer-events: all;
+  width: 130px;
+  min-height: 80px;
+  padding: 14px 12px 12px;
+  border-radius: 2px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: #333;
+  cursor: grab;
+  transition: box-shadow 0.2s, transform 0.1s;
+  z-index: 10;
+}
+.sticky:hover {
+  box-shadow: 5px 6px 18px rgba(0,0,0,0.28) !important;
+  z-index: 20;
+}
+.sticky:active { cursor: grabbing; }
+
+/* ===== ウィンドウシステム ===== */
+#win-container {
+  position: absolute;
+  inset: 0;
+}
+
+.win {
+  position: absolute;
+  min-width: 320px;
+  min-height: 200px;
+  border: 2px solid var(--win-border);
+  border-radius: 6px 6px 4px 4px;
+  box-shadow: var(--shadow-win);
+  background: var(--win-bg);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s;
+}
+
+.win-active { box-shadow: 6px 6px 24px rgba(0,0,20,0.55); }
+
+/* タイトルバー */
+.win-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  height: 30px;
+  background: linear-gradient(to bottom, var(--title-grad2), var(--title-grad1));
+  border-radius: 4px 4px 0 0;
+  cursor: move;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* 非アクティブウィンドウのタイトルバー */
+.win:not(.win-active) .win-bar {
+  background: linear-gradient(to bottom, #7a9ccf, #5580b8);
+}
+
+.win-icon-sm { font-size: 14px; flex-shrink: 0; }
+
+.win-title {
+  flex: 1;
+  color: var(--title-text);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+.win-controls { display: flex; gap: 3px; }
+
+.win-btn {
+  width: 20px; height: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #e8e8e8, #c8c8c8);
+  color: #333;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s;
+  flex-shrink: 0;
+}
+.win-btn:hover { background: linear-gradient(to bottom, #fff, #ddd); }
+.wbtn-close:hover { background: linear-gradient(to bottom, #ff6b6b, #cc2222); color: #fff; }
+
+/* ウィンドウ本体 */
+.win-body {
+  flex: 1;
+  overflow: auto;
+  background: var(--win-body-bg);
+  border-top: 1px solid #aab;
+  scrollbar-width: thin;
+  scrollbar-color: #aab #f0f0f0;
+}
+
+/* ===== 日記ウィンドウ ===== */
+.diary-wrap { display: flex; flex-direction: column; height: 100%; }
+
+.diary-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px 8px 0;
+  background: #e8ecf0;
+  border-bottom: 2px solid #b0bcd0;
+}
+
+.dtab {
+  padding: 4px 10px;
+  border: 1px solid #9ab;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: #d4dce8;
+  font-size: 11px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  color: #446;
+  transition: background 0.1s;
+}
+.dtab:hover     { background: #e0e8f4; }
+.dtab.dtab-active { background: #fff; border-color: #7090c0; color: #224; font-weight: 700; }
+
+.diary-pane {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 20px;
+}
+
+.diary-date {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e8e8e8;
+  font-family: var(--font-mono);
+}
+
+.diary-body {
+  font-size: 13px;
+  line-height: 1.9;
+  color: #334;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+/* 黒塗り部分 */
+.censored {
+  display: inline;
+  background: var(--censored-bg);
+  color: var(--censored-bg);
+  border-radius: 2px;
+  cursor: not-allowed;
+  letter-spacing: 2px;
+  transition: background 0.2s;
+  user-select: none;
+}
+.censored:hover { background: #1a1a1a; }
+
+/* ===== ボイスメモウィンドウ ===== */
+.vm-wrap { display: flex; flex-direction: column; height: 100%; }
+
+.vm-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.audio-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid #eef;
+  transition: background 0.1s;
+}
+.audio-row:hover { background: #f0f4ff; }
+
+.audio-ico  { font-size: 18px; flex-shrink: 0; }
+.audio-name { flex: 1; font-size: 12px; color: #334; }
+.audio-dur  { font-size: 11px; color: #888; font-family: var(--font-mono); }
+
+.audio-play {
+  padding: 3px 10px;
+  border: 1px solid #9ab;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #e8f0ff, #d0dcf0);
+  font-size: 11px;
+  cursor: pointer;
+  color: #224;
+  transition: background 0.1s;
+}
+.audio-play:hover { background: linear-gradient(to bottom, #d0e0ff, #b8ccee); }
+
+.vm-player {
+  padding: 10px 14px;
+  background: #f4f6fa;
+  border-top: 1px solid #d8dce8;
+  flex-shrink: 0;
+}
+
+.vm-nowplay { font-size: 11px; color: #556; margin-bottom: 6px; }
+
+.vm-progbar-wrap {
+  height: 6px;
+  background: #dde;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.vm-progbar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+  transition: width 0.1s linear;
+}
+
+.vm-stop {
+  padding: 3px 10px;
+  border: 1px solid #9ab;
+  border-radius: 3px;
+  background: #e8e8f0;
+  font-size: 11px;
+  cursor: pointer;
+  color: #334;
+}
+.vm-stop:hover { background: #d8d8e8; }
+
+/* ===== フォルダ・ファイルリスト ===== */
+.folder-wrap { padding: 8px; height: 100%; display: flex; flex-direction: column; }
+
+.folder-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #668;
+  padding: 4px 8px 8px;
+  border-bottom: 1px solid #dde;
+  margin-bottom: 6px;
+}
+
+.flist { flex: 1; overflow: auto; }
+
+.fitem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.fitem:hover  { background: #ddeeff; }
+.fitem-sel    { background: #b8d0ee; }
+.fitem-ico    { font-size: 18px; }
+.fitem-name   { font-size: 12px; color: #224; }
+
+.flist-hint   { font-size: 10px; color: #aaa; text-align: right; padding: 4px 8px 0; }
+
+/* ===== テキストファイルウィンドウ ===== */
+.txt-wrap { padding: 16px 20px; height: 100%; overflow: auto; }
+
+.txt-body {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: #334;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ===== ゴミ箱 ===== */
+.recycle-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+}
+
+/* ===== タスクバー ===== */
+#taskbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--bar-h);
+  background: linear-gradient(to bottom, var(--taskbar-bg2), var(--taskbar-bg1));
+  border-top: 1px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 6px;
+  z-index: 8000;
+}
+
+#taskbar-items {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tb-btn {
+  padding: 2px 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 11px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.tb-btn:hover { background: rgba(255,255,255,0.28); }
+
+#clock {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+/* ===== パスワードモーダル ===== */
+#pw-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9500;
+}
+#pw-modal.hidden { display: none; }
+
+#pw-dialog {
+  background: #f0f0f0;
+  border: 2px solid #1a4e9c;
+  border-radius: 6px;
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.5);
+  min-width: 280px;
+  overflow: hidden;
+}
+
+.pw-titlebar {
+  background: linear-gradient(to bottom, #2b88e0, #1158b4);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+.pw-body { padding: 16px; }
+
+.pw-label { font-size: 12px; color: #334; margin-bottom: 8px; }
+
+#pw-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #9ab;
+  border-radius: 3px;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  outline: none;
+  background: #fff;
+  margin-bottom: 10px;
+}
+#pw-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+
+.pw-btns { display: flex; justify-content: flex-end; gap: 6px; }
+
+.pw-btn {
+  padding: 4px 14px;
+  border: 1px solid #9ab;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  background: linear-gradient(to bottom, #e8f0ff, #d0dcf0);
+  color: #224;
+  transition: background 0.1s;
+}
+.pw-btn:hover  { background: linear-gradient(to bottom, #d8e8ff, #c0cce0); }
+.pw-btn-ok     { font-weight: 700; }
+
+#pw-error {
+  font-size: 11px;
+  color: #cc2222;
+  margin-bottom: 8px;
+}
+#pw-error.hidden { display: none; }
+
+/* シェイクアニメーション（パスワード失敗） */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+.shake { animation: shake 0.45s ease; }
+
+/* ===== タイプライターオーバーレイ ===== */
+#typewriter-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9200;
+  pointer-events: none;
+}
+#typewriter-overlay.hidden { display: none; }
+#typewriter-overlay.tw-fadeout { animation: twfade 0.8s ease forwards; }
+@keyframes twfade { to { opacity: 0; } }
+
+#typewriter-win {
+  background: rgba(240,244,255,0.95);
+  border: 1px solid #9ab;
+  border-radius: 4px;
+  box-shadow: 3px 3px 20px rgba(0,0,50,0.3);
+  padding: 24px 30px;
+  max-width: 340px;
+  min-width: 240px;
+  pointer-events: none;
+}
+
+#typewriter-text {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 2;
+  color: #334;
+  white-space: pre-wrap;
+  min-height: 2em;
+}
+
+/* カーソル点滅 */
+#typewriter-text::after {
+  content: '█';
+  color: #3b82f6;
+  animation: blink 0.7s step-end infinite;
+}
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ===== フィードバック画面 ===== */
+#feedback-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,18,40,0.94);
+  z-index: 9800;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+}
+#feedback-screen.hidden { display: none; }
+
+#fb-wrap {
+  width: 100%;
+  max-width: 880px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+
+#fb-header {
+  background: linear-gradient(to right, #1158b4, #2b88e0);
+  padding: 24px 32px;
+  text-align: center;
+}
+
+#fb-logo {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+}
+
+#fb-subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 4px;
+  letter-spacing: 3px;
+}
+
+#fb-body {
+  display: flex;
+  gap: 0;
+  padding: 0;
+}
+
+#fb-left {
+  flex: 1;
+  padding: 24px 28px;
+  border-right: 1px solid #e0e8f0;
+}
+
+#fb-right {
+  width: 340px;
+  padding: 24px 20px;
+  flex-shrink: 0;
+}
+
+.fb-section { margin-bottom: 24px; }
+
+.fb-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1158b4;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #dde8f8;
+}
+
+#fb-narrative {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #445;
+  font-family: var(--font-mono);
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 4px;
+  border: 1px solid #e8f0f8;
+}
+
+.fb-profile { margin-bottom: 14px; }
+
+.fb-profile-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.fb-profile-label { font-size: 12px; font-weight: 700; color: #334; }
+
+.fb-grade {
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.grade-high { background: #dbeafe; color: #1d4ed8; }
+.grade-mid  { background: #fef9c3; color: #854d0e; }
+.grade-low  { background: #fee2e2; color: #991b1b; }
+
+.fb-score-val {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.fb-profile-desc { font-size: 11px; color: #667; line-height: 1.7; }
+
+#radar-canvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+#fb-meta {
+  background: #f0f4ff;
+  padding: 18px 32px;
+  text-align: center;
+  border-top: 1px solid #dde8f8;
+}
+#fb-meta p { font-size: 12px; color: #446; line-height: 2; }
+.fb-meta-small { font-size: 10px !important; color: #aab !important; margin-top: 8px; }
+
+#fb-footer {
+  padding: 16px 32px;
+  text-align: center;
+  border-top: 1px solid #e8e8e8;
+}
+
+#fb-close-btn {
+  padding: 8px 28px;
+  background: linear-gradient(to bottom, #e8f0ff, #d0dcf0);
+  border: 1px solid #9ab;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  color: #224;
+  transition: background 0.15s;
+}
+#fb-close-btn:hover { background: linear-gradient(to bottom, #d4e4ff, #bccce0); }
+
+/* ===== ユーティリティ ===== */
+.hidden { display: none !important; }
+
+/* スクロールバー統一 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #aab #f0f0f0;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track  { background: #f0f0f0; }
+::-webkit-scrollbar-thumb  { background: #aab; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #889; }
+
+/* ===== レスポンシブ対応 ===== */
+@media (max-width: 700px) {
+  #fb-body { flex-direction: column; }
+  #fb-right { width: 100%; border-top: 1px solid #e0e8f0; border-right: none; }
+}

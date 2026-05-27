@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life Decipher</title>
+  <meta name="description" content="不確実性創発型ステルスアセスメント・シミュレーター — Life Decipher Ver 2.1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========================
+       デスクトップ本体
+       ======================== -->
+  <div id="desktop">
+
+    <!-- グリッチ用 Canvas オーバーレイ -->
+    <canvas id="noise-overlay"></canvas>
+
+    <!-- デスクトップアイコン -->
+    <div id="desktop-icons"></div>
+
+    <!-- 付箋エリア -->
+    <div id="sticky-area"></div>
+
+    <!-- ウィンドウコンテナ -->
+    <div id="win-container"></div>
+
+    <!-- タイプライターオーバーレイ -->
+    <div id="typewriter-overlay" class="hidden">
+      <div id="typewriter-win">
+        <div id="typewriter-text"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================
+       タスクバー
+       ======================== -->
+  <div id="taskbar">
+    <div id="taskbar-items"></div>
+    <div id="clock">00:00</div>
+  </div>
+
+  <!-- ========================
+       パスワードモーダル
+       ======================== -->
+  <div id="pw-modal" class="hidden">
+    <div id="pw-dialog">
+      <div class="pw-titlebar">🔒 パスワードを入力</div>
+      <div class="pw-body">
+        <div class="pw-label">このフォルダはパスワードで保護されています。</div>
+        <div id="pw-error" class="hidden">パスワードが違います。</div>
+        <input type="password" id="pw-input" placeholder="パスワード" autocomplete="off">
+        <div class="pw-btns">
+          <button id="pw-cancel" class="pw-btn">キャンセル</button>
+          <button id="pw-ok"     class="pw-btn pw-btn-ok">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================
+       フィードバック画面
+       ======================== -->
+  <div id="feedback-screen" class="hidden"></div>
+
+  <!-- ========================
+       スクリプト読み込み（順序依存）
+       ======================== -->
+  <!-- 1. コンテンツデータ -->
+  <script src="content/diary.js"></script>
+  <script src="content/notes.js"></script>
+  <script src="content/files.js"></script>
+
+  <!-- 2. エンジン層 -->
+  <script src="logger.js"></script>
+  <script src="assessment.js"></script>
+  <script src="audio.js"></script>
+  <script src="effects.js"></script>
+  <script src="feedback.js"></script>
+
+  <!-- 3. メインアプリ（最後） -->
+  <script src="app.js"></script>
+
+</body>
+</html>
