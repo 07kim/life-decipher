@@ -26,7 +26,8 @@ window.LD.Logger = (function () {
     scrollAttempts: 0,
     windowCloseCount: 0,
     maxIdleTime: 0,
-    folderCreated: false
+    folderCreated: false,
+    fileOpenOrder: []
   };
 
   let lastClickTime = 0;
@@ -139,8 +140,15 @@ window.LD.Logger = (function () {
     },
 
     logFileOpen(id, name) {
+      if (!log.totalFilesOpened.has(id)) {
+        log.fileOpenOrder.push({
+          id: id,
+          name: name,
+          time: Date.now() - log.sessionStart
+        });
+        log.totalFilesOpened.add(id);
+      }
       log.fileOpens[id] = (log.fileOpens[id] || 0) + 1;
-      log.totalFilesOpened.add(id);
       
       // 日記の閲覧順序を記録
       if (id.startsWith('diary-d')) {

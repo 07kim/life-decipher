@@ -60,7 +60,7 @@ window.LD.Feedback = (function () {
     lines.push(`開封ファイル数： ${logData.totalFilesOpened.size} 件`);
     lines.push('');
 
-    if (logData.fileOpenOrder.length > 0) {
+    if (logData.fileOpenOrder && logData.fileOpenOrder.length > 0) {
       const first = logData.fileOpenOrder[0];
       const sec0 = Math.floor(first.time / 1000);
       lines.push(`最初に手を伸ばしたのは「${first.name}」でした（開始から ${sec0} 秒後）。`);
