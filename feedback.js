@@ -76,8 +76,8 @@ window.LD.Feedback = (function () {
       lines.push(`黒塗り部分へのアクセスが ${logData.scrollAttempts} 回記録されました。その執重さが、答えへの扉を開きました。`);
     }
 
-    if (audioTotal > 0) {
-      lines.push(`ノイズ混じりの音声を合計 ${audioTotal} 回再生しました。その向こうに何かを聞こうとしていました。`);
+    if (logData.audioPlays > 0) {
+      lines.push(`音声を合計 ${logData.audioPlays} 回再生しました。${logData.audioStops > 0 ? 'しかし途中で何度も打ち切るなど、最後まで耳を傾ける余裕はなかったようです。' : '最後まで静かに聴き入っていました。'}`);
     }
 
     if (logData.escCount > 0) {
@@ -85,16 +85,23 @@ window.LD.Feedback = (function () {
       lines.push(`「Escape」キーを ${logData.escCount} 回押しました。${suffix}`);
     }
 
-    if (logData.notesMoved > 0) {
-      lines.push(`デスクトップの付箋を ${logData.notesMoved} 回移動させました。カオスに秩序を与えようとする本能が働きました。`);
+    const noteTotal = (logData.noteDrags.red||0) + (logData.noteDrags.yellow||0) + (logData.noteDrags.blue||0);
+    if (noteTotal > 0) {
+      let fav = 'すべて';
+      if (logData.noteDrags.red > logData.noteDrags.yellow && logData.noteDrags.red > logData.noteDrags.blue) fav = '赤い付箋（核心となるヒント）';
+      else if (logData.noteDrags.yellow > logData.noteDrags.red && logData.noteDrags.yellow > logData.noteDrags.blue) fav = '黄色い付箋（物語の断片）';
+      else if (logData.noteDrags.blue > logData.noteDrags.red && logData.noteDrags.blue > logData.noteDrags.yellow) fav = '青い付箋（システム情報）';
+      
+      lines.push(`付箋を ${noteTotal} 回動かしました。特に${fav}に執着し、カオスに秩序を与えようとする傾向が見られました。`);
     }
 
     if (logData.passwordAttempts.length > 0) {
-      if (pwOk) {
-        lines.push(`${pwFail > 0 ? pwFail + ' 回の失敗の末、' : ''}隠しフォルダの鍵を解きました。`);
-      } else {
-        lines.push(`隠しフォルダに ${logData.passwordAttempts.length} 回挑みましたが、まだ鍵は閉ざされています。`);
-      }
+      const type = logData.unlockType || 'none';
+      if (type === 'composite') lines.push(`散らばった複数の情報を正しく組み合わせ、『3key5』を導き出し真相へ到達しました。`);
+      else if (type === 'linguistic') lines.push(`日記に隠された縦読みの暗号に気づき、『wake』を入力。細かな言語的違和感を見逃しませんでした。`);
+      else if (type === 'math') lines.push(`数列の規則性を見抜き、『1321』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
+      else if (type === 'visual') lines.push(`ゲーム内のテキストではなく、「付箋のカラーコード」というメタ情報から『93c5fd』を導き出しました。極めて高いメタ思考です。`);
+      else lines.push(`隠しフォルダに ${logData.passwordAttempts.length} 回挑みましたが、まだ鍵は閉ざされています。`);
     }
 
     return lines.join('\n');

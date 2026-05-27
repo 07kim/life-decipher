@@ -6,19 +6,27 @@ window.LD.Logger = (function () {
   const log = {
     sessionStart: Date.now(),
     clicks: [],
-    anomalyClickCount: 0,
-    pointerRoughness: 0,
-    fileOpenOrder: [],
+    clickCount: 0,
+    dragDistance: 0,
+    fileOpens: {},
     totalFilesOpened: new Set(),
-    scrollAttempts: 0,
-    audioReplays: {},
+    audioPlays: 0,
+    passwordAttempts: [], // { pass: string, success: bool }
+    // 新アセスメント指標
+    noteDrags: { red: 0, yellow: 0, blue: 0 },
+    diaryReads: [], // 開いた順序の記録
+    audioStops: 0,
+    audioCompletes: 0,
+    // Anomalies
+    anomalyClickCount: 0,
     escCount: 0,
-    windowCloseCount: 0,
     idleStart: Date.now(),
+    glitchTriggers: 0,
+    pointerRoughness: 0,
+    scrollAttempts: 0,
+    windowCloseCount: 0,
     maxIdleTime: 0,
-    folderCreated: false,
-    notesMoved: 0,
-    passwordAttempts: []
+    folderCreated: false
   };
 
   let lastClickTime = 0;
@@ -130,16 +138,14 @@ window.LD.Logger = (function () {
       resetIdle();
     },
 
-    logFileOpen(fileId, fileName) {
-      if (!log.totalFilesOpened.has(fileId)) {
-        log.fileOpenOrder.push({
-          id: fileId,
-          name: fileName,
-          time: Date.now() - log.sessionStart
-        });
-        log.totalFilesOpened.add(fileId);
+    logFileOpen(id, name) {
+      log.fileOpens[id] = (log.fileOpens[id] || 0) + 1;
+      log.totalFilesOpened.add(id);
+      
+      // 日記の閲覧順序を記録
+      if (id.startsWith('diary-d')) {
+        log.diaryReads.push(id.replace('diary-d', '')); // '1', '2' などのIDを保存
       }
-      window.LD.Assessment && window.LD.Assessment.update('openness', 1);
     },
 
     logCensoredScroll() {
@@ -149,12 +155,9 @@ window.LD.Logger = (function () {
       }
     },
 
-    logAudioReplay(audioId) {
-      log.audioReplays[audioId] = (log.audioReplays[audioId] || 0) + 1;
-      if (log.audioReplays[audioId] > 1) {
-        window.LD.Assessment && window.LD.Assessment.update('openness', 1);
-      }
-    },
+    logAudioReplay(id) { log.audioPlays++; },
+    logAudioStop() { log.audioStops++; },
+    logAudioComplete() { log.audioCompletes++; },
 
     logWindowClose() {
       log.windowCloseCount++;
@@ -162,17 +165,14 @@ window.LD.Logger = (function () {
       window.LD.Effects && window.LD.Effects.checkThresholds(log);
     },
 
-    logNoteMoved() {
-      log.notesMoved++;
-      window.LD.Assessment && window.LD.Assessment.update('planning', 3);
+    logNoteMoved(type) {
+      if (type && log.noteDrags[type] !== undefined) {
+        log.noteDrags[type]++;
+      }
     },
 
-    logPasswordAttempt(attempt, success) {
-      log.passwordAttempts.push({
-        attempt,
-        success,
-        time: Date.now() - log.sessionStart
-      });
+    logPasswordAttempt(pass, success) {
+      log.passwordAttempts.push({ pass, success });
       if (success) {
         window.LD.Assessment && window.LD.Assessment.update('immersion', 5);
       } else {

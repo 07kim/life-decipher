@@ -122,7 +122,7 @@ window.LD.App = (function () {
     document.addEventListener('mouseup', () => { dragging = false; });
   }
 
-  function makeStickyDraggable(el) {
+  function makeStickyDraggable(el, type) {
     let dragging = false, ox = 0, oy = 0, ox0 = 0, oy0 = 0;
     let moved = false;
     el.addEventListener('mousedown', e => {
@@ -141,7 +141,7 @@ window.LD.App = (function () {
       el.style.top  = (oy0 + dy) + 'px';
     });
     document.addEventListener('mouseup', () => {
-      if (dragging && moved) window.LD.Logger.logNoteMoved();
+      if (dragging && moved) window.LD.Logger.logNoteMoved(type);
       dragging = false;
     });
   }
@@ -196,7 +196,7 @@ window.LD.App = (function () {
         box-shadow:3px 4px 10px ${n.shadowColor};
       `;
       el.innerHTML = n.text.replace(/\n/g, '<br>');
-      makeStickyDraggable(el);
+      makeStickyDraggable(el, n.type);
       container.appendChild(el);
     });
   }
@@ -298,22 +298,32 @@ window.LD.App = (function () {
         window.LD.Audio.play(
           memo,
           pct => { bar.style.width = (pct * 100) + '%'; },
-          ()  => { win.querySelector('#vm-nowplay').textContent = `完了: ${memo.name}`; }
+          ()  => {
+            win.querySelector('#vm-nowplay').textContent = `完了: ${memo.name}`;
+            window.LD.Logger.logAudioComplete();
+          }
         );
       });
     });
 
     win.querySelector('#vm-stop').addEventListener('click', () => {
       window.LD.Audio.stop();
+      window.LD.Logger.logAudioStop();
       win.querySelector('#vm-nowplay').textContent = '再生停止中';
       win.querySelector('#vm-prog').style.width = '0%';
       currentId = null;
     });
   }
 
-  function openHiddenFolder() {
+  function openHiddenFolder(unlockType = 'composite') {
     window.LD.Logger.logFileOpen('hidden-folder', '隠しフォルダ');
-    const files = window.LD.HIDDEN_FILES;
+    
+    // パスワードの種類に応じて表示するファイルを切り替える
+    let files = window.LD.HIDDEN_FILES;
+    if (unlockType === 'linguistic') files = files.filter(f => f.id === 'report_linguistic');
+    else if (unlockType === 'math') files = files.filter(f => f.id === 'report_math');
+    else if (unlockType === 'visual') files = files.filter(f => f.id === 'report_visual');
+    else files = files.filter(f => f.id === 'report_composite');
 
     const list = files.map(f => `
       <div class="fitem" data-id="${f.id}">
@@ -340,7 +350,7 @@ window.LD.App = (function () {
       });
       item.addEventListener('dblclick', () => {
         const file = files.find(f => f.id === item.dataset.id);
-        if (file) openTextFile(file);
+        if (file) openTextFile(file, unlockType);
       });
     });
 
@@ -349,7 +359,7 @@ window.LD.App = (function () {
     if (icon) icon.textContent = '📂';
   }
 
-  function openTextFile(file) {
+  function openTextFile(file, unlockType = 'composite') {
     window.LD.Logger.logFileOpen(file.id, file.name);
 
     const html = `
@@ -360,9 +370,11 @@ window.LD.App = (function () {
 
     createWindow(file.id, file.name, html, { width: 520, height: 460 });
 
-    // report.txt を開いたらゲーム終了トリガー
     if (file.trigger === 'ending') {
-      setTimeout(() => window.LD.Feedback.show(window.LD.Logger.getLog()), 3500);
+      // ログにパスワードタイプを付与してフィードバック画面へ渡す
+      const log = window.LD.Logger.getLog();
+      log.unlockType = unlockType;
+      setTimeout(() => window.LD.Feedback.show(log), 3500);
     }
   }
 
@@ -407,12 +419,19 @@ window.LD.App = (function () {
 
     function attempt() {
       const val = input.value.trim().toLowerCase();
-      const ok  = (val === '3key5' || val === '3key005');
+      
+      let unlockType = null;
+      if (val === '3key5' || val === '3key005') unlockType = 'composite';
+      else if (val === 'wake') unlockType = 'linguistic';
+      else if (val === '1321') unlockType = 'math';
+      else if (val === '93c5fd' || val === '#93c5fd') unlockType = 'visual';
+
+      const ok = (unlockType !== null);
       window.LD.Logger.logPasswordAttempt(val, ok);
 
       if (ok) {
         modal.classList.add('hidden');
-        openHiddenFolder();
+        openHiddenFolder(unlockType);
       } else {
         err.classList.remove('hidden');
         input.value = '';

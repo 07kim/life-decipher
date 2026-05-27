@@ -4,15 +4,17 @@ window.LD = window.LD || {};
 window.LD.STICKY_NOTES = [
   {
     id: 'note1',
-    text: 'あれは、\n見られてはいけない',
+    type: 'yellow', // ロア・感情
+    text: '私は被験者X。\nここはどこだ？\n思い出せない。',
     color: '#fef08a',
-    shadowColor: 'rgba(180,160,0,0.25)',
-    x: 80,
-    y: 120,
+    shadowColor: 'rgba(200,180,50,0.2)',
+    x: 100,
+    y: 80,
     rotation: -3.5
   },
   {
     id: 'note2',
+    type: 'red', // 核心・パスワード
     text: '鍵は3つ。\n「3」と「key」と\n重要な「音」だ。',
     color: '#fca5a5',
     shadowColor: 'rgba(180,50,50,0.2)',
@@ -22,20 +24,22 @@ window.LD.STICKY_NOTES = [
   },
   {
     id: 'note3',
-    text: '記憶は\n▓▓▓▓▓▓▓\nする',
-    color: '#93c5fd',
-    shadowColor: 'rgba(30,80,180,0.2)',
-    x: 860,
-    y: 190,
-    rotation: -1.8
+    type: 'yellow', // 数理・論理
+    text: '1, 1, 2, 3, 5, 8\n\n?, ?\n\n続く2つの数字。',
+    color: '#fef08a',
+    shadowColor: 'rgba(200,180,50,0.2)',
+    x: 400,
+    y: 350,
+    rotation: 1.5
   },
   {
     id: 'note4',
-    text: '最初は\n誰でも\n気づかない',
-    color: '#86efac',
-    shadowColor: 'rgba(20,140,60,0.2)',
-    x: 110,
-    y: 460,
-    rotation: 1.6
+    type: 'blue', // 視覚・メタ
+    text: '本当の鍵は、\nこの紙の「色」\nそのものだ。',
+    color: '#93c5fd',
+    shadowColor: 'rgba(50,100,180,0.2)',
+    x: 720,
+    y: 400,
+    rotation: -2.8
   }
 ];

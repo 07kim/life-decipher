@@ -32,6 +32,13 @@ window.LD.DIARY = [
     censored: []
   },
   {
+    id: 'd10',
+    date: '20XX年9月10日',
+    title: '記録10',
+    content: `W: Waiting for the end.\nA: Always being watched.\nK: Keep silent.\nE: Everything is a design.\n\n誰かの声か、それとも私の無意識か。\n頭文字だけが、やけにクリアに点滅している。`,
+    censored: []
+  },
+  {
     id: 'd20',
     date: '20XX年9月20日',
     title: '記録20',
