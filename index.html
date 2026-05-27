@@ -45,16 +45,26 @@
 
   <!-- ========================
        パスワードモーダル
-       ========================  <!-- 隠しフォルダ コンソール -->
+       ========================  <!-- 隠しフォルダ コンソール (Stealth UI) -->
   <div id="pw-modal" class="hidden">
     <div id="pw-dialog">
-      <div class="pw-titlebar">LD System Terminal</div>
+      <div class="pw-titlebar">Archive Extractor (Error 0x8A99)</div>
       <div class="pw-body">
-        <div class="pw-label">シミュレーションを終了するための、結論または考察パラメータを入力してください。</div>
-        <textarea id="pw-input" autocomplete="off" spellcheck="false" placeholder="ここにキーワード等を入力..."></textarea>
-        <div id="pw-error" class="hidden">有効な結論が検出されませんでした。</div>
+        <div class="pw-label">破損したアーカイブを展開するためのデータフラグメントを入力してください。</div>
+        <div class="pw-fragments">
+          <div class="pw-fragment-row">
+            <span>Fragment 1:</span><input type="text" id="pw-frag1" autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="pw-fragment-row">
+            <span>Fragment 2:</span><input type="text" id="pw-frag2" autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="pw-fragment-row">
+            <span>Fragment 3:</span><input type="text" id="pw-frag3" autocomplete="off" spellcheck="false" />
+          </div>
+        </div>
+        <div id="pw-error" class="hidden">フラグメントのハッシュが一致しません。</div>
         <div class="pw-btns">
-          <button class="pw-btn pw-btn-ok" id="pw-ok">解析を実行</button>
+          <button class="pw-btn pw-btn-ok" id="pw-ok">マウント</button>
           <button class="pw-btn" id="pw-cancel">キャンセル</button>
         </div>
       </div>

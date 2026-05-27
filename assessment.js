@@ -6,9 +6,12 @@ window.LD.Assessment = (function () {
   // リアルタイムスコア（0〜100）
   const scores = {
     chaos:             50,  // カオス耐性
-    openness:          30,  // 開放性・知的好奇心
-    conscientiousness: 30,  // 誠実性・系統性
-    planning:          30,  // プランニング能力
+    openness:          30,  // 知的開放性
+    conscientiousness: 30,  // 系統的探索
+    math:              30,  // 論理・数理思考
+    spatial:           30,  // 空間・視覚認知
+    linguistic:        30,  // 言語・文脈理解
+    integration:       30,  // 情報統合力
     immersion:         20   // 没入深度
   };
 
@@ -40,7 +43,7 @@ window.LD.Assessment = (function () {
       const pwAttempts   = logData.passwordAttempts.length;
       const unlockType   = logData.unlockType || 'none';
 
-      // 1. 日記の閲覧順序がシーケンシャルか（誠実性）
+      // 1. 日記の閲覧順序がシーケンシャルか（系統的探索）
       let sequentialDiaryReads = 0;
       for (let i = 1; i < logData.diaryReads.length; i++) {
         if (parseInt(logData.diaryReads[i]) === parseInt(logData.diaryReads[i-1]) + 1) {
@@ -52,52 +55,67 @@ window.LD.Assessment = (function () {
       const redDrags = logData.noteDrags.red || 0;
       const yellowDrags = logData.noteDrags.yellow || 0;
       const blueDrags = logData.noteDrags.blue || 0;
+      const kangoDrags = logData.noteDrags.kango || 0; // 仮に青付箋として扱うが後で拡張可能
 
-      // カオス耐性（ESC・連打・ウィンドウ閉じの少なさ、visual突破で特大ボーナス）
+      // カオス耐性（連打・ESC回避、無意味な探索の少なさ）
       const rawChaos = 100
         - logData.anomalyClickCount * 1.5
         - logData.escCount          * 4
         - logData.windowCloseCount  * 3
-        + (logData.audioStops       * 5)  // 途中で切る＝カオス傾向
-        + (unlockType === 'visual' ? 40 : 0);
+        + (logData.audioStops       * 5);
       scores.chaos = Math.max(0, Math.min(100, rawChaos));
 
-      // 開放性（黒塗りへのこだわり、音声再生の多さ、visual突破）
+      // 知的開放性（黒塗り、音声への関心）
       scores.openness = Math.min(100,
         20
         + logData.scrollAttempts * 6
         + logData.audioPlays      * 5
         + pwAttempts              * 2
-        + (unlockType === 'visual' ? 30 : 0)
       );
 
-      // 誠実性（音声完走、順序読解、blue付箋、linguistic/math突破）
+      // 系統的探索（順序読解、整理された行動）
       scores.conscientiousness = Math.min(100,
         20
         + logData.audioCompletes * 8
         + sequentialDiaryReads   * 5
-        + blueDrags              * 4
-        + (unlockType === 'linguistic' ? 30 : 0)
-        + (unlockType === 'math' ? 20 : 0)
       );
 
-      // プランニング（red付箋、math/composite突破、当てずっぽうペナルティ）
-      const bruteForcePenalty = pwAttempts > 5 && unlockType !== 'composite' ? 20 : 0;
-      scores.planning = Math.min(100,
+      // 論理・数理思考（math突破、計算メモ）
+      scores.math = Math.min(100,
         20
-        + redDrags * 5
-        + (unlockType === 'math' ? 40 : 0)
-        + (unlockType === 'composite' ? 30 : 0)
+        + (unlockType === 'math' ? 60 : 0)
+        + (logData.passwordAttempts.some(a => /\d/.test(a.val)) ? 15 : 0)
+      );
+
+      // 空間・視覚認知（visual突破、blue付箋操作）
+      scores.spatial = Math.min(100,
+        20
+        + blueDrags * 3
+        + (unlockType === 'visual' ? 60 : 0)
+      );
+
+      // 言語・文脈理解（linguistic突破、赤付箋操作、日記熟読）
+      scores.linguistic = Math.min(100,
+        20
+        + redDrags * 4
+        + sequentialDiaryReads * 4
+        + (unlockType === 'linguistic' ? 60 : 0)
+      );
+
+      // 情報統合力（composite突破、複数の付箋の整理）
+      const bruteForcePenalty = pwAttempts > 5 && unlockType !== 'composite' ? 20 : 0;
+      scores.integration = Math.min(100,
+        20
+        + (yellowDrags + redDrags + blueDrags) * 2
+        + (unlockType === 'composite' ? 60 : 0)
         - bruteForcePenalty
       );
 
-      // 没入深度（プレイ時間、yellow付箋、linguistic/composite突破）
+      // 没入深度（プレイ時間、黄色付箋）
       scores.immersion = Math.min(100,
         Math.min(30, elapsedMin * 4)
         + filesOpened * 2
-        + yellowDrags * 5
-        + (unlockType === 'linguistic' ? 40 : 0)
-        + (unlockType === 'composite' ? 20 : 0)
+        + yellowDrags * 4
       );
 
       return { ...scores, frustration };

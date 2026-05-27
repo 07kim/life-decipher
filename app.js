@@ -159,7 +159,6 @@ window.LD.App = (function () {
       { id: 'voice-memos',   label: 'ボイスメモ',         emoji: '📁', x: 32,     y: 148,       action: openVoiceMemos },
       { id: 'sketchbook',    label: '落書き帳.png',        emoji: '🖥️', x: 32,     y: 264,       action: openSketchbook },
       { id: 'calc-memo',     label: '計算メモ.txt',       emoji: '📊', x: 32,     y: 380,       action: openCalcMemo },
-      { id: 'cipher-note',   label: '暗号メモ.txt',       emoji: '🔍', x: 32,     y: 496,       action: openCipherNote },
       { id: 'recycle-bin',   label: 'ゴミ箱',             emoji: '🗑️', x: W - 90, y: 32,        action: openRecycleBin },
       { id: 'hidden-folder', label: '隠しフォルダ',       emoji: '🔒', x: W - 90, y: H - 170,   action: () => openPasswordModal('hidden-folder') },
       { id: 'analysis-report', label: '分析レポート.pdf', emoji: '📊', x: W - 90, y: 148, action: () => window.LD.Feedback.show(window.LD.Logger.getLog(), true), hidden: true }
@@ -200,7 +199,17 @@ window.LD.App = (function () {
         transform:rotate(${n.rotation}deg);
         box-shadow:3px 4px 10px ${n.shadowColor};
       `;
-      el.innerHTML = n.text.replace(/\n/g, '<br>');
+      let content = n.text.replace(/\n/g, '<br>');
+      
+      // 勘合符ギミックの挿入
+      if (n.kangoLeft) {
+        content += `<span class="kango-char kango-left-edge">${n.kangoLeft}</span>`;
+      }
+      if (n.kangoRight) {
+        content += `<span class="kango-char kango-right-edge">${n.kangoRight}</span>`;
+      }
+      
+      el.innerHTML = content;
       makeStickyDraggable(el, n.type);
       container.appendChild(el);
     });
@@ -458,47 +467,6 @@ Fibonacci sequence
     createWindow('calc-memo', '計算メモ.txt', html, { width: 500, height: 440, x: 160, y: 90 });
   }
 
-  function openCipherNote() {
-    window.LD.Logger.logFileOpen('cipher-note', '暗号メモ.txt');
-    const content = `暗号メモ
-=====================================
-
-【縦読み（アクロスティック）について】
-
-  文章の各行の「最初の文字」を
-  上から順に読むと、隠されたメッセージが現れる。
-
-  例:
-    W ater flows
-    A lways downward
-    K eeping secrets
-    E ternal movement
-
-  → W-A-K-E
-
-=====================================
-
-【カラーコードについて】
-
-  HTMLのカラーコード（16進数）：
-  # + 6文字の16進数
-
-  例:
-    #ff0000 = 赤
-    #00ff00 = 緑
-    #0000ff = 青
-    #93c5fd = ???
-
-  ブラウザの開発者ツール（F12）で
-  要素の色コードを確認できる。
-
-=====================================
-
-このメモは誰が書いたのか。
-`;
-    const html = `<div class="txt-wrap"><pre class="txt-body">${escapeHtml(content)}</pre></div>`;
-    createWindow('cipher-note', '暗号メモ.txt', html, { width: 500, height: 480, x: 200, y: 80 });
-  }
 
   function openRecycleBin() {
     window.LD.Logger.logFileOpen('recycle-bin', 'ゴミ箱');
@@ -524,29 +492,34 @@ Fibonacci sequence
   function openPasswordModal(target) {
     pwTarget = target;
     const modal = document.getElementById('pw-modal');
-    const input = document.getElementById('pw-input');
-    const err   = document.getElementById('pw-error');
+    const f1 = document.getElementById('pw-frag1');
+    const f2 = document.getElementById('pw-frag2');
+    const f3 = document.getElementById('pw-frag3');
+    const err = document.getElementById('pw-error');
+    
     modal.classList.remove('hidden');
-    input.value = '';
+    f1.value = ''; f2.value = ''; f3.value = '';
     err.classList.add('hidden');
-    setTimeout(() => input.focus(), 50);
+    setTimeout(() => f1.focus(), 50);
   }
 
   function initPasswordModal() {
     const modal  = document.getElementById('pw-modal');
-    const input  = document.getElementById('pw-input');
+    const f1 = document.getElementById('pw-frag1');
+    const f2 = document.getElementById('pw-frag2');
+    const f3 = document.getElementById('pw-frag3');
     const err    = document.getElementById('pw-error');
     const okBtn  = document.getElementById('pw-ok');
     const canBtn = document.getElementById('pw-cancel');
 
     function attempt() {
-      const val = input.value.trim().toLowerCase();
+      const val = (f1.value + f2.value + f3.value).trim().toLowerCase();
       
       let unlockType = null;
       if (val.includes('3') && val.includes('key') && val.includes('5')) unlockType = 'composite';
       else if (val.includes('wake')) unlockType = 'linguistic';
       else if (val.includes('3455')) unlockType = 'math';
-      else if (val.includes('a5acfd')) unlockType = 'visual';
+      else if (val.includes('void')) unlockType = 'visual';
 
       const ok = (unlockType !== null);
       window.LD.Logger.logPasswordAttempt(val, ok);
@@ -556,7 +529,7 @@ Fibonacci sequence
         openHiddenFolder(unlockType);
       } else {
         err.classList.remove('hidden');
-        input.value = '';
+        f1.value = ''; f2.value = ''; f3.value = '';
         const dlg = document.getElementById('pw-dialog');
         dlg.classList.add('shake');
         setTimeout(() => dlg.classList.remove('shake'), 500);
@@ -566,10 +539,14 @@ Fibonacci sequence
 
     okBtn.addEventListener('click', attempt);
     canBtn.addEventListener('click', () => modal.classList.add('hidden'));
-    input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') attempt();
-      if (e.key === 'Escape') modal.classList.add('hidden');
+    
+    [f1, f2, f3].forEach(f => {
+      f.addEventListener('keydown', e => {
+        if (e.key === 'Enter') attempt();
+        if (e.key === 'Escape') modal.classList.add('hidden');
+      });
     });
+
     modal.addEventListener('click', e => {
       if (e.target === modal) modal.classList.add('hidden');
     });

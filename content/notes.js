@@ -49,75 +49,25 @@ window.LD.STICKY_NOTES = [
     rotation: -2.1
   },
 
-  // ━━ 視覚ルート（a5acfd）へのヒント Step1 ━━
+  // ━━ 空間・視覚ルート（勘合符パズル） ━━
   {
-    id: 'note5',
-    type: 'blue',
-    text: '③\n色には\n意味がある。',
-    color: '#93c5fd',
-    shadowColor: 'rgba(50,100,180,0.2)',
-    x: 720,
-    y: 430,
-    rotation: -2.8
+    id: 'kango1', type: 'blue', text: '何か足りない', color: '#bae6fd', shadowColor: 'rgba(50,100,180,0.2)', x: 120, y: 350, rotation: -2.8,
+    kangoRight: 'V'
   },
-
-  // ━━ 言語ルート（wake）へのヒント Step1 ━━
   {
-    id: 'note6',
-    type: 'red',
-    text: '彼の詩の中に\n何かが\n隠されている',
-    color: '#fcd4a5',
-    shadowColor: 'rgba(180,100,20,0.2)',
-    x: 450,
-    y: 70,
-    rotation: -1.4
+    id: 'kango2', type: 'blue', text: '繋がらない', color: '#93c5fd', shadowColor: 'rgba(50,100,180,0.2)', x: 800, y: 150, rotation: 1.4,
+    kangoLeft: 'V', kangoRight: 'O'
   },
-
-  // ━━ 世界観 ━━
   {
-    id: 'note7',
-    type: 'yellow',
-    text: 'なぜ\nここに\n私がいる',
-    color: '#d9f99d',
-    shadowColor: 'rgba(80,140,20,0.15)',
-    x: 130,
-    y: 450,
-    rotation: 2.6
+    id: 'kango3', type: 'blue', text: '見えない', color: '#7dd3fc', shadowColor: 'rgba(50,100,180,0.2)', x: 400, y: 380, rotation: -1.5,
+    kangoLeft: 'O', kangoRight: 'I'
   },
-
-  // ━━ 複合ルート Step2への誘導 ━━
   {
-    id: 'note8',
-    type: 'blue',
-    text: '音声の中に\n答えがある\nと思っていた',
-    color: '#bae6fd',
-    shadowColor: 'rgba(30,120,180,0.18)',
-    x: 540,
-    y: 400,
-    rotation: 1.2
+    id: 'kango4', type: 'blue', text: '意味がない', color: '#38bdf8', shadowColor: 'rgba(50,100,180,0.2)', x: 650, y: 430, rotation: 2.1,
+    kangoLeft: 'I', kangoRight: 'D'
   },
-
-  // ━━ 視覚ルート Step2への誘導 ━━
   {
-    id: 'note9',
-    type: 'blue',
-    text: '②\nWebは全て\n数字と記号で\n動いている',
-    color: '#86efac', // 緑色に変更
-    shadowColor: 'rgba(20,140,60,0.2)',
-    x: 870,
-    y: 200,
-    rotation: 3.1
-  },
-
-  // ━━ 視覚ルート Step3への誘導（新規） ━━
-  {
-    id: 'note10',
-    type: 'yellow',
-    text: '3つの色の\n「尻尾」を\n繋げ',
-    color: '#fef08a',
-    shadowColor: 'rgba(200,180,50,0.2)',
-    x: 350,
-    y: 120,
-    rotation: -1.5
+    id: 'kango5', type: 'blue', text: 'ここはどこだ', color: '#0ea5e9', shadowColor: 'rgba(50,100,180,0.2)', x: 250, y: 90, rotation: -0.5,
+    kangoLeft: 'D'
   }
 ];

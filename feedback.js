@@ -16,7 +16,7 @@ window.LD.Feedback = (function () {
       ]),
       buildProfile('知的開放性', scores.openness, [
         [70, '高', '黒塗りのテキスト、ノイズ混じりの音声——それでも諦めず「何かがある」と信じて掘り続けました。謎の前で燃えるタイプです。'],
-        [40, '中', '気になる部分は調べましたが、すべての謎に執重するわけではありませんでした。バランス型の探索者です。'],
+        [40, '中', '気になる部分は調べましたが、すべての謎に執着するわけではありませんでした。バランス型の探索者です。'],
         [ 0, '低', '不明瞭な情報への深入りより、明確な手がかりを優先する傾向があります。実用的な判断力を持つタイプです。']
       ]),
       buildProfile('系統的探索', scores.conscientiousness, [
@@ -24,10 +24,25 @@ window.LD.Feedback = (function () {
         [40, '中', '興味を引くものから順に調べる、直感先行型の探索スタイルでした。'],
         [ 0, '低', 'いくつかの手がかりに絞って深く掘り下げました。選択と集中型の思考者です。']
       ]),
-      buildProfile('プランニング能力', scores.planning, [
-        [60, '高', '散らばった要素を自らの手で整理しようとしました。カオスを「コントロールしたい」という本能が強いタイプです。'],
-        [30, '中', '環境の変化に応じて柔軟に行動を調整しました。'],
-        [ 0, '低', '与えられた環境をそのまま受け入れて探索しました。適応力の高いタイプです。']
+      buildProfile('論理・数理思考', scores.math, [
+        [60, '高', '隠された数理的パターンを素早く見抜く力があります。感情より論理を信じるタイプです。'],
+        [30, '中', '数字の規則性にある程度気づき、論理的なアプローチを試みました。'],
+        [ 0, '低', '計算や論理の組み立てよりも、直感やひらめきを重視するタイプです。']
+      ]),
+      buildProfile('空間・視覚認知', scores.spatial, [
+        [60, '高', '画面上のオブジェクトの配置や断片的な視覚情報を繋ぎ合わせる、高い空間認識能力を持っています。'],
+        [30, '中', '視覚的な手がかりに気づき、配置を意識した探索を行いました。'],
+        [ 0, '低', '視覚情報よりも、言語情報や論理的な手がかりを優先するタイプです。']
+      ]),
+      buildProfile('言語・文脈理解', scores.linguistic, [
+        [60, '高', 'テキストの細かな違和感や文脈のズレを察知する、高い言語的感性を持っています。'],
+        [30, '中', '文章の中に隠された意味をある程度読み取る力があります。'],
+        [ 0, '低', 'テキストの深読みよりも、直感的な情報処理を好むタイプです。']
+      ]),
+      buildProfile('情報統合力', scores.integration, [
+        [60, '高', '散らばった断片的な情報を一つの結論に結びつける、高いメタ認知能力を持っています。'],
+        [30, '中', '複数の情報を関連付けようとする努力が見られました。'],
+        [ 0, '低', '目の前の単一の課題に集中する傾向があり、情報を広く結びつけるのは苦手かもしれません。']
       ]),
       buildProfile('没入深度', scores.immersion, [
         [70, '深', '物語世界に完全に引き込まれていました。隠しフォルダへの挑戦がその証拠です。'],
@@ -99,7 +114,7 @@ window.LD.Feedback = (function () {
       if (type === 'composite') lines.push(`散らばった複数の情報を正しく組み合わせ、『3key5』を導き出し真相へ到達しました。`);
       else if (type === 'linguistic') lines.push(`日記に隠された縦読みの暗号に気づき、『wake』を入力。細かな言語的違和感を見逃しませんでした。`);
       else if (type === 'math') lines.push(`数列の規則性を見抜き、『3455』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
-      else if (type === 'visual') lines.push(`「3枚の付箋の順番」と「カラーコードの末尾（尻尾）」という2つのメタ情報を結びつけ、『a5acfd』を導き出しました。極めて高い情報統合力とメタ認知です。`);
+      else if (type === 'visual') lines.push(`画面上に散らばった付箋の「端」を繋ぎ合わせ、『void』という隠された文字を浮かび上がらせました。極めて高い空間・視覚的認知能力です。`);
       else lines.push(`隠しフォルダに ${pwFail} 回挑みましたが、まだ鍵は閉ざされています。`);
     }
 
@@ -114,13 +129,16 @@ window.LD.Feedback = (function () {
     const W = canvas.width, H = canvas.height;
     const cx = W / 2, cy = H / 2;
     const R  = Math.min(cx, cy) - 48;
-    const N  = 5;
-    const labels = ['カオス耐性', '開放性', '系統性', 'プランニング', '没入深度'];
+    const N  = 8;
+    const labels = ['カオス耐性', '知的開放性', '系統的探索', '数理思考', '空間・視覚', '言語・文脈', '情報統合力', '没入深度'];
     const values = [
       scores.chaos             / 100,
       scores.openness          / 100,
       scores.conscientiousness / 100,
-      scores.planning          / 100,
+      scores.math              / 100,
+      scores.spatial           / 100,
+      scores.linguistic        / 100,
+      scores.integration       / 100,
       scores.immersion         / 100
     ];
 
@@ -176,7 +194,7 @@ window.LD.Feedback = (function () {
     }
 
     // ラベル
-    ctx.font      = '12px "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+    ctx.font      = '11px "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
     ctx.fillStyle = '#334155';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -232,7 +250,7 @@ window.LD.Feedback = (function () {
       try {
         scores = window.LD.Assessment.calculateFinal(logData);
       } catch(e) {
-        scores = { chaos: 50, openness: 30, conscientiousness: 30, planning: 30, immersion: 20, frustration: 0 };
+        scores = { chaos: 50, openness: 30, conscientiousness: 30, math: 30, spatial: 30, linguistic: 30, integration: 30, immersion: 20, frustration: 0 };
       }
 
       let profiles, narrative;

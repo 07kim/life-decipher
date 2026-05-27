@@ -152,23 +152,41 @@ html, body {
 
 .sticky {
   position: absolute;
-  pointer-events: all;
-  width: 130px;
-  min-height: 80px;
-  padding: 14px 12px 12px;
-  border-radius: 2px;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.55;
+  width: 140px;
+  min-height: 140px;
+  padding: 12px 14px;
+  font-family: var(--font-hand);
+  font-size: 15px;
+  line-height: 1.4;
   color: #333;
   cursor: grab;
-  transition: box-shadow 0.2s, transform 0.1s;
-  z-index: 10;
+  user-select: none;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* 勘合文字がはみ出さないように */
 }
-.sticky:hover {
-  box-shadow: 5px 6px 18px rgba(0,0,0,0.28) !important;
-  z-index: 20;
+.sticky:active { cursor: grabbing; box-shadow: 5px 8px 15px rgba(0,0,0,0.3) !important; z-index: 9999 !important; }
+
+/* 勘合符（端合わせ）ギミック */
+.kango-char {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 120px;
+  font-family: monospace;
+  font-weight: 900;
+  color: rgba(0,0,0,0.06);
+  pointer-events: none;
+  line-height: 1;
+}
+/* 右端に配置される（文字の左半分） */
+.kango-right-edge {
+  right: -30px;
+  clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+}
+/* 左端に配置される（文字の右半分） */
+.kango-left-edge {
+  left: -30px;
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
 }
 .sticky:active { cursor: grabbing; }
 
@@ -516,12 +534,25 @@ html, body {
 
 .pw-body { padding: 16px; }
 
-.pw-label { font-size: 12px; color: #aab; margin-bottom: 8px; font-family: var(--font-mono); }
-
-#pw-input {
-  width: 100%;
-  height: 120px;
-  padding: 10px 12px;
+.pw-fragments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.pw-fragment-row {
+  display: flex;
+  align-items: center;
+}
+.pw-fragment-row span {
+  width: 85px;
+  color: #789;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.pw-fragment-row input {
+  flex: 1;
+  padding: 6px 10px;
   border: 1px solid #446;
   border-radius: 3px;
   font-size: 13px;
@@ -529,10 +560,8 @@ html, body {
   outline: none;
   background: #050510;
   color: #3b82f6;
-  margin-bottom: 12px;
-  resize: vertical;
 }
-#pw-input:focus { border-color: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.4); }
+.pw-fragment-row input:focus { border-color: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.4); }
 
 .pw-btns { display: flex; justify-content: flex-end; gap: 6px; }
 
@@ -832,3 +861,4 @@ html, body {
   100% { box-shadow: 0 0 0 transparent; background: transparent; }
 }
 .icon-glow { animation: glowIcon 3s ease-out; border-radius: 4px; }
+.pw-label { font-size: 12px; color: #aab; margin-bottom: 8px; font-family: var(--font-mono); }
