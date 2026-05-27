@@ -594,11 +594,34 @@ window.LD.App = (function () {
 
   function triggerSameColorReveal(rc, gc, bc) {
     window.LD.Effects && window.LD.Effects.showTypewriter('色を分けた——\nそれぞれが語り始める');
+
+    // 短いフラッシュラベル（3秒）
     setTimeout(() => {
       spawnFloatingLabel(rc.x, rc.y, 'a5', '#fca5a5');
       spawnFloatingLabel(gc.x, gc.y, 'ac', '#86efac');
       spawnFloatingLabel(bc.x, bc.y, 'fd', '#93c5fd');
     }, 1800);
+
+    // フラッシュが消えた後、永続メモ付箋をデスクトップに残す
+    setTimeout(() => {
+      const area = document.getElementById('sticky-area');
+      if (!area || document.getElementById('discovery-color-note')) return;
+      const cx = Math.min(Math.max((rc.x + gc.x + bc.x) / 3, 160), window.innerWidth  - 180);
+      const cy = Math.min(Math.max((rc.y + gc.y + bc.y) / 3, 80),  window.innerHeight - 220);
+      const note = document.createElement('div');
+      note.className = 'sticky';
+      note.id = 'discovery-color-note';
+      note.style.cssText = `left:${cx}px;top:${cy}px;background:#fafaf0;border:1px dashed #bbb;opacity:0;transition:opacity 0.8s;z-index:200;transform:rotate(-1deg);box-shadow:2px 3px 8px rgba(0,0,0,0.15);`;
+      note.innerHTML = `<span style="font-family:monospace;font-size:11px;color:#555;line-height:2.2;">
+        <span style="font-size:10px;color:#aaa;display:block;margin-bottom:2px;">【発見】</span>
+        <span style="color:#c0392b;font-weight:bold;">赤</span> → <code style="background:#fce8e8;padding:1px 5px;border-radius:2px;font-size:13px;">a5</code><br>
+        <span style="color:#27ae60;font-weight:bold;">緑</span> → <code style="background:#e8fced;padding:1px 5px;border-radius:2px;font-size:13px;">ac</code><br>
+        <span style="color:#2563eb;font-weight:bold;">青</span> → <code style="background:#e8f0fe;padding:1px 5px;border-radius:2px;font-size:13px;">fd</code>
+      </span>`;
+      area.appendChild(note);
+      requestAnimationFrame(() => { note.style.opacity = '1'; });
+      makeStickyDraggable(note, null);
+    }, 5500);
   }
 
   function triggerTricolorReveal(center) {
