@@ -161,12 +161,14 @@ window.LD.App = (function () {
       { id: 'calc-memo',     label: '計算メモ.txt',       emoji: '📊', x: 32,     y: 380,       action: openCalcMemo },
       { id: 'cipher-note',   label: '暗号メモ.txt',       emoji: '🔍', x: 32,     y: 496,       action: openCipherNote },
       { id: 'recycle-bin',   label: 'ゴミ箱',             emoji: '🗑️', x: W - 90, y: 32,        action: openRecycleBin },
-      { id: 'hidden-folder', label: '隠しフォルダ',       emoji: '🔒', x: W - 90, y: H - 170,   action: () => openPasswordModal('hidden-folder') }
+      { id: 'hidden-folder', label: '隠しフォルダ',       emoji: '🔒', x: W - 90, y: H - 170,   action: () => openPasswordModal('hidden-folder') },
+      { id: 'analysis-report', label: '分析レポート.pdf', emoji: '📊', x: W - 90, y: 148, action: () => window.LD.Feedback.show(window.LD.Logger.getLog(), true), hidden: true }
     ];
 
     items.forEach(item => {
       const el = document.createElement('div');
       el.className = 'desktop-icon' + (item.id === 'diary-txt' ? ' icon-hint-pulse' : '');
+      if (item.hidden) el.style.display = 'none';
       el.id = item.id;
       el.setAttribute('data-id', item.id);
       el.style.left = item.x + 'px';
@@ -442,9 +444,9 @@ window.LD.App = (function () {
 ■ パスワードは4桁〜6桁の可能性
 
   候補:
-    - 1321    ← ？
-    - 2134    ← ？
-    - 13210   ← 長すぎ？
+    - 3455    ← ？
+    - 5534    ← ？
+    - 132134  ← 長すぎ？
 
 =====================================
 
@@ -541,10 +543,10 @@ Fibonacci sequence
       const val = input.value.trim().toLowerCase();
       
       let unlockType = null;
-      if (val === '3key5' || val === '3key005') unlockType = 'composite';
-      else if (val === 'wake') unlockType = 'linguistic';
-      else if (val === '1321') unlockType = 'math';
-      else if (val === '93c5fd' || val === '#93c5fd') unlockType = 'visual';
+      if (val.includes('3') && val.includes('key') && val.includes('5')) unlockType = 'composite';
+      else if (val.includes('wake')) unlockType = 'linguistic';
+      else if (val.includes('3455')) unlockType = 'math';
+      else if (val.includes('93c5fd')) unlockType = 'visual';
 
       const ok = (unlockType !== null);
       window.LD.Logger.logPasswordAttempt(val, ok);
@@ -617,6 +619,11 @@ Fibonacci sequence
         if (e.key === 'Escape') {
           const modal = document.getElementById('pw-modal');
           if (!modal.classList.contains('hidden')) modal.classList.add('hidden');
+        }
+        // Ctrl+Shift+A (または Cmd+Shift+A) でリアルタイム分析画面を表示
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+          e.preventDefault();
+          window.LD.Feedback.show(window.LD.Logger.getLog(), true);
         }
       });
 

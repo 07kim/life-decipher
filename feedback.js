@@ -98,7 +98,7 @@ window.LD.Feedback = (function () {
       const type = logData.unlockType || 'none';
       if (type === 'composite') lines.push(`散らばった複数の情報を正しく組み合わせ、『3key5』を導き出し真相へ到達しました。`);
       else if (type === 'linguistic') lines.push(`日記に隠された縦読みの暗号に気づき、『wake』を入力。細かな言語的違和感を見逃しませんでした。`);
-      else if (type === 'math') lines.push(`数列の規則性を見抜き、『1321』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
+      else if (type === 'math') lines.push(`数列の規則性を見抜き、『3455』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
       else if (type === 'visual') lines.push(`ゲーム内のテキストではなく、「付箋のカラーコード」というメタ情報から『93c5fd』を導き出しました。極めて高いメタ思考です。`);
       else lines.push(`隠しフォルダに ${pwFail} 回挑みましたが、まだ鍵は閉ざされています。`);
     }
@@ -213,9 +213,20 @@ window.LD.Feedback = (function () {
   }
 
   return {
-    show(logData) {
+    show(logData, isShortcut = false) {
       // 暗転divを削除しておく（演出の残骸が残らないように）
       document.querySelectorAll('div[style*="z-index: 9700"]').forEach(el => el.remove());
+
+      // エンディング到達時（ショートカット以外）なら、デスクトップに分析レポートアイコンを出現させる
+      if (!isShortcut) {
+        const reportIcon = document.getElementById('analysis-report');
+        if (reportIcon) {
+          reportIcon.style.display = 'flex';
+          // 少し光らせる演出
+          reportIcon.classList.add('icon-glow');
+          setTimeout(() => reportIcon.classList.remove('icon-glow'), 5000);
+        }
+      }
 
       let scores;
       try {
