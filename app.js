@@ -163,7 +163,7 @@ window.LD.App = (function () {
 
     items.forEach(item => {
       const el = document.createElement('div');
-      el.className = 'desktop-icon';
+      el.className = 'desktop-icon' + (item.id === 'diary-txt' ? ' icon-hint-pulse' : '');
       el.id = item.id;
       el.setAttribute('data-id', item.id);
       el.style.left = item.x + 'px';
@@ -174,6 +174,7 @@ window.LD.App = (function () {
       el.addEventListener('click', () => {
         document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('icon-sel'));
         el.classList.add('icon-sel');
+        el.classList.remove('icon-hint-pulse');
       });
       container.appendChild(el);
     });
@@ -405,8 +406,8 @@ window.LD.App = (function () {
     const canBtn = document.getElementById('pw-cancel');
 
     function attempt() {
-      const val = input.value.trim();
-      const ok  = val.toLowerCase() === '3key';
+      const val = input.value.trim().toLowerCase();
+      const ok  = (val === '3key5' || val === '3key005');
       window.LD.Logger.logPasswordAttempt(val, ok);
 
       if (ok) {

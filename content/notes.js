@@ -13,7 +13,7 @@ window.LD.STICKY_NOTES = [
   },
   {
     id: 'note2',
-    text: '3つの鍵',
+    text: '鍵は3つ。\n「3」と「key」と\n重要な「音」だ。',
     color: '#fca5a5',
     shadowColor: 'rgba(180,50,50,0.2)',
     x: 680,

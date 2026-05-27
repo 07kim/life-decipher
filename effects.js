@@ -138,13 +138,13 @@ window.LD.Effects = (function () {
       }
     },
 
-    // Lv.3: 5分間アイドル → タイプライター
+    // Lv.3: 1分間アイドル → タイプライター
     triggerLevel3() {
       if (triggered.has('lv3')) return;
       triggered.add('lv3');
       triggerGlitch(400);
       setTimeout(() => {
-        showTypewriter('迷っているのか？\n\n……大丈夫。\nみんな、そうする。');
+        showTypewriter('迷っているのか？\n\nまずは……\n「日記」を読んでみろ。');
       }, 1000);
     },
 

@@ -98,10 +98,10 @@ window.LD.Logger = (function () {
     log.idleStart = now;
 
     if (idleTimer) clearTimeout(idleTimer);
-    // 5分間操作なし → Level3 トリガー
+    // 1分間操作なし → Level3 トリガー
     idleTimer = setTimeout(() => {
       window.LD.Effects && window.LD.Effects.triggerLevel3();
-    }, 5 * 60 * 1000);
+    }, 1 * 60 * 1000);
   }
 
   // ===========================
