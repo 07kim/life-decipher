@@ -167,6 +167,7 @@ html, body {
 #win-container {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 .win {
@@ -180,6 +181,7 @@ html, body {
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.15s;
+  pointer-events: auto;
 }
 
 .win-active { box-shadow: 6px 6px 24px rgba(0,0,20,0.55); }

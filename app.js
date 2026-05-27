@@ -485,4 +485,8 @@ window.LD.App = (function () {
   };
 })();
 
-document.addEventListener('DOMContentLoaded', () => window.LD.App.init());
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => window.LD.App.init());
+} else {
+  window.LD.App.init();
+}
