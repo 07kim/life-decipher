@@ -2,16 +2,16 @@
 window.LD = window.LD || {};
 
 window.LD.VOICE_MEMOS = [
-  { id: 'vm001', name: '音声_001.wav',       duration: 47,  noiseType: 'white', hasVoice: true,  voiceGain: 0.30 },
-  { id: 'vm002', name: '音声_002.wav',       duration: 23,  noiseType: 'brown', hasVoice: false, voiceGain: 0.00 },
-  { id: 'vm003', name: '音声_003.wav',       duration: 89,  noiseType: 'white', hasVoice: true,  voiceGain: 0.15 },
-  { id: 'vm004', name: '音声_004.wav',       duration: 12,  noiseType: 'pink',  hasVoice: true,  voiceGain: 0.50 },
-  { id: 'vm005', name: '音声_005(重要).wav', duration: 156, noiseType: 'white', hasVoice: true,  voiceGain: 0.60, important: true },
-  { id: 'vm006', name: '音声_006.wav',       duration: 34,  noiseType: 'brown', hasVoice: false, voiceGain: 0.00 },
-  { id: 'vm007', name: '音声_007.wav',       duration: 67,  noiseType: 'pink',  hasVoice: true,  voiceGain: 0.20 },
-  { id: 'vm008', name: '音声_008.wav',       duration: 45,  noiseType: 'white', hasVoice: true,  voiceGain: 0.40 },
-  { id: 'vm009', name: '音声_009.wav',       duration: 8,   noiseType: 'white', hasVoice: false, voiceGain: 0.00 },
-  { id: 'vm010', name: '音声_010(最後).wav', duration: 203, noiseType: 'brown', hasVoice: true,  voiceGain: 0.80, important: true }
+  { id: 'vm001', name: '音声_001.wav',       duration: 4,  noiseType: 'white', hasVoice: true,  voiceGain: 0.30 },
+  { id: 'vm002', name: '音声_002.wav',       duration: 2,  noiseType: 'brown', hasVoice: false, voiceGain: 0.00 },
+  { id: 'vm003', name: '音声_003.wav',       duration: 8,  noiseType: 'white', hasVoice: true,  voiceGain: 0.15 },
+  { id: 'vm004', name: '音声_004.wav',       duration: 3,  noiseType: 'pink',  hasVoice: true,  voiceGain: 0.50 },
+  { id: 'vm005', name: '音声_005(重要).wav', duration: 7,  noiseType: 'white', hasVoice: true,  voiceGain: 0.60, important: true },
+  { id: 'vm006', name: '音声_006.wav',       duration: 3,  noiseType: 'brown', hasVoice: false, voiceGain: 0.00 },
+  { id: 'vm007', name: '音声_007.wav',       duration: 6,  noiseType: 'pink',  hasVoice: true,  voiceGain: 0.20 },
+  { id: 'vm008', name: '音声_008.wav',       duration: 4,  noiseType: 'white', hasVoice: true,  voiceGain: 0.40 },
+  { id: 'vm009', name: '音声_009.wav',       duration: 2,  noiseType: 'white', hasVoice: false, voiceGain: 0.00 },
+  { id: 'vm010', name: '音声_010.wav',       duration: 9,  noiseType: 'brown', hasVoice: true,  voiceGain: 0.80 }
 ];
 
 window.LD.HIDDEN_FILES = [

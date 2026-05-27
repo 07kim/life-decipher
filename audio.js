@@ -82,8 +82,8 @@ window.LD.Audio = (function () {
       stopCurrent();
       const ctx = getCtx();
 
-      // 実際の再生時間（表示値の約10%、最大9秒）
-      const playDuration = Math.min(memoConfig.duration * 0.10, 9);
+      // 実際の再生時間
+      const playDuration = memoConfig.duration;
 
       const noiseBuffer = makeNoiseBuffer(memoConfig.noiseType || 'white', playDuration);
       if (memoConfig.hasVoice && memoConfig.voiceGain > 0) {
