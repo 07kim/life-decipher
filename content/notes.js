@@ -41,5 +41,35 @@ window.LD.STICKY_NOTES = [
     x: 720,
     y: 400,
     rotation: -2.8
+  },
+  {
+    id: 'note5',
+    type: 'yellow', // 数理・計算
+    text: '13\n21\n\n次は…?',
+    color: '#86efac',
+    shadowColor: 'rgba(20,140,60,0.2)',
+    x: 200,
+    y: 450,
+    rotation: 2.1
+  },
+  {
+    id: 'note6',
+    type: 'red', // 言語・暗号
+    text: '各行の\n最初の文字\nを読んで',
+    color: '#f9a8d4',
+    shadowColor: 'rgba(180,50,100,0.2)',
+    x: 490,
+    y: 90,
+    rotation: -1.4
+  },
+  {
+    id: 'note7',
+    type: 'yellow',
+    text: 'この非常口\n誰にも\n言えない',
+    color: '#fef9c3',
+    shadowColor: 'rgba(180,160,0,0.15)',
+    x: 860,
+    y: 155,
+    rotation: 1.8
   }
 ];

@@ -155,10 +155,13 @@ window.LD.App = (function () {
     const H = window.innerHeight;
 
     const items = [
-      { id: 'diary-txt',     label: '日記.txt',     emoji: '📝', x: 32, y: 32,   action: openDiary },
-      { id: 'voice-memos',   label: 'ボイスメモ',   emoji: '📁', x: 32, y: 148,  action: openVoiceMemos },
-      { id: 'recycle-bin',   label: 'ゴミ箱',       emoji: '🗑️', x: W - 90, y: 32, action: openRecycleBin },
-      { id: 'hidden-folder', label: '隠しフォルダ', emoji: '🔒', x: W - 90, y: H - 170, action: () => openPasswordModal('hidden-folder') }
+      { id: 'diary-txt',     label: '日記.txt',         emoji: '📝', x: 32,     y: 32,        action: openDiary },
+      { id: 'voice-memos',   label: 'ボイスメモ',         emoji: '📁', x: 32,     y: 148,       action: openVoiceMemos },
+      { id: 'sketchbook',    label: '落書き帳.png',        emoji: '🖥️', x: 32,     y: 264,       action: openSketchbook },
+      { id: 'calc-memo',     label: '計算メモ.txt',       emoji: '📊', x: 32,     y: 380,       action: openCalcMemo },
+      { id: 'cipher-note',   label: '暗号メモ.txt',       emoji: '🔍', x: 32,     y: 496,       action: openCipherNote },
+      { id: 'recycle-bin',   label: 'ゴミ箱',             emoji: '🗑️', x: W - 90, y: 32,        action: openRecycleBin },
+      { id: 'hidden-folder', label: '隠しフォルダ',       emoji: '🔒', x: W - 90, y: H - 170,   action: () => openPasswordModal('hidden-folder') }
     ];
 
     items.forEach(item => {
@@ -404,6 +407,95 @@ window.LD.App = (function () {
 
       }, 5500); // テキストを読む時間 (5.5秒)
     }
+  }
+
+  function openSketchbook() {
+    window.LD.Logger.logFileOpen('sketchbook', '落書き帳.png');
+    const html = `
+      <div style="padding:8px;height:100%;display:flex;flex-direction:column;align-items:center;background:#e8e0d8;">
+        <div style="font-size:10px;color:#888;margin-bottom:6px;font-family:monospace;">落書き帳.png — 画像ビューア</div>
+        <img src="assets/sketchbook.png"
+             style="max-width:100%;max-height:calc(100% - 28px);object-fit:contain;border:1px solid #bbb;box-shadow:2px 2px 8px rgba(0,0,0,0.2);"
+             alt="落書き帳">
+      </div>
+    `;
+    createWindow('sketchbook', '落書き帳.png — 画像ビューア', html, { width: 560, height: 500, x: 120, y: 60 });
+  }
+
+  function openCalcMemo() {
+    window.LD.Logger.logFileOpen('calc-memo', '計算メモ.txt');
+    const content = `計算メモ — 途中経過
+=====================================
+
+■ 数列の続きは何だ？
+
+  1, 1, 2, 3, 5, 8, 13, 21, [?], [?]
+
+  規則: 前の2つの数を足す
+  → 13 + 21 = ___
+  → 21 + [?] = ___
+
+  答えは [13][21] か...?
+
+=====================================
+
+■ パスワードは4桁〜6桁の可能性
+
+  候補:
+    - 1321    ← ？
+    - 2134    ← ？
+    - 13210   ← 長すぎ？
+
+=====================================
+
+NOTE: フィボナッチ数列
+Fibonacci sequence
+名前の由来: Leonardo Fibonacci (1170-1250)
+`;
+    const html = `<div class="txt-wrap"><pre class="txt-body">${escapeHtml(content)}</pre></div>`;
+    createWindow('calc-memo', '計算メモ.txt', html, { width: 500, height: 440, x: 160, y: 90 });
+  }
+
+  function openCipherNote() {
+    window.LD.Logger.logFileOpen('cipher-note', '暗号メモ.txt');
+    const content = `暗号メモ
+=====================================
+
+【縦読み（アクロスティック）について】
+
+  文章の各行の「最初の文字」を
+  上から順に読むと、隠されたメッセージが現れる。
+
+  例:
+    W ater flows
+    A lways downward
+    K eeping secrets
+    E ternal movement
+
+  → W-A-K-E
+
+=====================================
+
+【カラーコードについて】
+
+  HTMLのカラーコード（16進数）：
+  # + 6文字の16進数
+
+  例:
+    #ff0000 = 赤
+    #00ff00 = 緑
+    #0000ff = 青
+    #93c5fd = ???
+
+  ブラウザの開発者ツール（F12）で
+  要素の色コードを確認できる。
+
+=====================================
+
+このメモは誰が書いたのか。
+`;
+    const html = `<div class="txt-wrap"><pre class="txt-body">${escapeHtml(content)}</pre></div>`;
+    createWindow('cipher-note', '暗号メモ.txt', html, { width: 500, height: 480, x: 200, y: 80 });
   }
 
   function openRecycleBin() {
