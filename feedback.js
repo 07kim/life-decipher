@@ -99,7 +99,7 @@ window.LD.Feedback = (function () {
       if (type === 'composite') lines.push(`散らばった複数の情報を正しく組み合わせ、『3key5』を導き出し真相へ到達しました。`);
       else if (type === 'linguistic') lines.push(`日記に隠された縦読みの暗号に気づき、『wake』を入力。細かな言語的違和感を見逃しませんでした。`);
       else if (type === 'math') lines.push(`数列の規則性を見抜き、『3455』を入力。混沌の中でも論理を信じ抜く強さを見せました。`);
-      else if (type === 'visual') lines.push(`ゲーム内のテキストではなく、「付箋のカラーコード」というメタ情報から『93c5fd』を導き出しました。極めて高いメタ思考です。`);
+      else if (type === 'visual') lines.push(`「3枚の付箋の順番」と「カラーコードの末尾（尻尾）」という2つのメタ情報を結びつけ、『a5acfd』を導き出しました。極めて高い情報統合力とメタ認知です。`);
       else lines.push(`隠しフォルダに ${pwFail} 回挑みましたが、まだ鍵は閉ざされています。`);
     }
 

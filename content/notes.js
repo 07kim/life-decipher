@@ -29,7 +29,7 @@ window.LD.STICKY_NOTES = [
   {
     id: 'note3',
     type: 'red',
-    text: '鍵は3つ。\n全ての断片を\n集めよ。',
+    text: '①\n鍵は3つ。\n全ての断片を\n集めよ。',
     color: '#fca5a5',
     shadowColor: 'rgba(180,50,50,0.2)',
     x: 680,
@@ -49,11 +49,11 @@ window.LD.STICKY_NOTES = [
     rotation: -2.1
   },
 
-  // ━━ 視覚ルート（93c5fd）へのヒント Step1 ━━
+  // ━━ 視覚ルート（a5acfd）へのヒント Step1 ━━
   {
     id: 'note5',
     type: 'blue',
-    text: '色には\n意味がある。',
+    text: '③\n色には\n意味がある。',
     color: '#93c5fd',
     shadowColor: 'rgba(50,100,180,0.2)',
     x: 720,
@@ -101,11 +101,23 @@ window.LD.STICKY_NOTES = [
   {
     id: 'note9',
     type: 'blue',
-    text: 'Webは全て\n数字と記号で\n動いている',
-    color: '#a5b4fc',
-    shadowColor: 'rgba(80,60,180,0.2)',
+    text: '②\nWebは全て\n数字と記号で\n動いている',
+    color: '#86efac', // 緑色に変更
+    shadowColor: 'rgba(20,140,60,0.2)',
     x: 870,
     y: 200,
     rotation: 3.1
+  },
+
+  // ━━ 視覚ルート Step3への誘導（新規） ━━
+  {
+    id: 'note10',
+    type: 'yellow',
+    text: '3つの色の\n「尻尾」を\n繋げ',
+    color: '#fef08a',
+    shadowColor: 'rgba(200,180,50,0.2)',
+    x: 350,
+    y: 120,
+    rotation: -1.5
   }
 ];

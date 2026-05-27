@@ -546,7 +546,7 @@ Fibonacci sequence
       if (val.includes('3') && val.includes('key') && val.includes('5')) unlockType = 'composite';
       else if (val.includes('wake')) unlockType = 'linguistic';
       else if (val.includes('3455')) unlockType = 'math';
-      else if (val.includes('93c5fd')) unlockType = 'visual';
+      else if (val.includes('a5acfd')) unlockType = 'visual';
 
       const ok = (unlockType !== null);
       window.LD.Logger.logPasswordAttempt(val, ok);
