@@ -638,6 +638,13 @@ window.LD.Feedback = (function () {
             <p class="fb-meta-small">— Project LD Ver.2.1 —</p>
           </div>
 
+          <div id="fb-share-block">
+            <div id="fb-share-title">あなたの診断タイプ: <strong>${typeInfo.name}</strong></div>
+            <div id="fb-share-desc">友達はどんなタイプ? 送ってみよう</div>
+            <button id="fb-share-btn">🔗 友達に送る</button>
+            <div id="fb-share-copied" class="hidden">✔ コピーしました！</div>
+          </div>
+
           <div id="fb-footer">
             <button id="fb-replay-btn">もう一度プレイ</button>
             <button id="fb-close-btn">画面を閉じる</button>
@@ -658,6 +665,21 @@ window.LD.Feedback = (function () {
 
         const replayBtn = document.getElementById('fb-replay-btn');
         if (replayBtn) replayBtn.addEventListener('click', () => location.reload());
+
+        const shareBtn = document.getElementById('fb-share-btn');
+        if (shareBtn) shareBtn.addEventListener('click', () => {
+          const shareText = `【Life Decipher — 行動診断】\n私の診断タイプは「${typeInfo.name}」でした。\n\n${typeInfo.tagline}\n\nあなたは何タイプ? ある人物のPCに残されたファイルを探索して、自分の行動パターンを診断してみて。\n👉 https://life-decipher.vercel.app`;
+          navigator.clipboard.writeText(shareText).then(() => {
+            const copied = document.getElementById('fb-share-copied');
+            if (copied) { copied.classList.remove('hidden'); setTimeout(() => copied.classList.add('hidden'), 3000); }
+          }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = shareText;
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+            const copied = document.getElementById('fb-share-copied');
+            if (copied) { copied.classList.remove('hidden'); setTimeout(() => copied.classList.add('hidden'), 3000); }
+          });
+        });
 
         // タブ切り替え
         screen.querySelectorAll('.fb-tab').forEach(btn => {
