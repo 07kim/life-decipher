@@ -889,8 +889,6 @@ window.LD.App = (function () {
           </div>
           <div class="bw-favs">
             <div class="bw-fav-hd">おすすめ</div>
-            <div><span class="bw-fav-link" data-key="twitx">🐦 TwitX — @subject_x</span></div>
-            <div><span class="bw-fav-link" data-key="mailbox">📧 MailBox (未読3件)</span></div>
             <div><span class="bw-fav-link" data-key="dailynet">📰 DailyNet — ローカルニュース</span></div>
             <div><span class="bw-fav-link" data-key="sticky">📌 付箋デザインガイド</span></div>
             <div><span class="bw-fav-link" data-key="colorlab">🎨 カラーコード入門</span></div>
@@ -1641,8 +1639,7 @@ Xが好んだのは「小さい順」だ。
     window.LD.Logger.logFileOpen('twitx-app', 'TwitX');
     window.LD.Assessment && window.LD.Assessment.update('info_seeking', 5);
     if (document.getElementById('win-twitx-app')) { focusWindow('twitx-app'); return; }
-    const log = window.LD.Logger.getLog();
-    const alreadyLoggedIn = log.twitxLoggedIn;
+    const alreadyLoggedIn = false;
     const loginHtml = `
       <div class="tx-app-wrap">
         <div class="tx-app-header">
@@ -1840,8 +1837,7 @@ Xが好んだのは「小さい順」だ。
     window.LD.Logger.logFileOpen('mailbox-app', 'MailBox');
     window.LD.Assessment && window.LD.Assessment.update('info_seeking', 5);
     if (document.getElementById('win-mailbox-app')) { focusWindow('mailbox-app'); return; }
-    const log = window.LD.Logger.getLog();
-    const alreadyLoggedIn = log.mailboxLoggedIn;
+    const alreadyLoggedIn = false;
     const loginHtml = `
       <div class="mb-app-wrap">
         <div class="mb-header">
