@@ -53,8 +53,8 @@ window.LD.Effects = (function () {
   // ===========================
   // Lv.2: 隠しフォルダ明滅
   // ===========================
-  function flickerHiddenFolder() {
-    const icon = document.querySelector('.desktop-icon[data-id="hidden-folder"]');
+  function flickerSystemFolder() {
+    const icon = document.querySelector('.desktop-icon[data-id="system-folder"]');
     if (!icon) return;
 
     let count = 0;
@@ -122,12 +122,12 @@ window.LD.Effects = (function () {
         setTimeout(() => triggerGlitch(350), 1500);
       }
 
-      // Lv.2: ESCキー5回以上 or パスワード失敗3回以上 → 隠しフォルダ明滅
-      if ((esc >= 5 || pwFailed >= 3) && !triggered.has('lv2')) {
+      // Lv.2: ESCキー5回以上 → systemフォルダ明滅
+      if (esc >= 5 && !triggered.has('lv2')) {
         triggered.add('lv2');
         setTimeout(() => {
           triggerGlitch(300);
-          setTimeout(() => flickerHiddenFolder(), 400);
+          setTimeout(() => flickerSystemFolder(), 400);
         }, 600);
       }
 

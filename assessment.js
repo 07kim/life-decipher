@@ -12,7 +12,8 @@ window.LD.Assessment = (function () {
     spatial:           30,  // 空間・視覚認知
     linguistic:        30,  // 言語・文脈理解
     integration:       30,  // 情報統合力
-    immersion:         20   // 没入深度
+    immersion:         20,  // 没入深度
+    info_seeking:      20   // 情報収集力
   };
 
   // 内部フラストレーション累積値
@@ -120,6 +121,18 @@ window.LD.Assessment = (function () {
         Math.min(30, elapsedMin * 4)
         + filesOpened * 2
         + yellowDrags * 4
+      );
+
+      // 情報収集力（ブラウザサイト訪問数、メール既読、DM送信）
+      const siteVisitCount = Object.keys(logData.browserSiteVisits || {}).length;
+      const mailReadCount  = (logData.mailsRead || []).length;
+      scores.info_seeking = Math.min(100,
+        20
+        + siteVisitCount * 8
+        + mailReadCount  * 5
+        + (logData.twitxDmSent   ? 20 : 0)
+        + (logData.mailDraftSent ? 20 : 0)
+        + (logData.browserSearches.length * 3)
       );
 
       return { ...scores, frustration };

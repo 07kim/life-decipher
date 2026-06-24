@@ -32,7 +32,27 @@ window.LD.Logger = (function () {
     fileOpenOrder: [],
     diaryReorderCount: 0,
     diaryChronological: false,
-    browserSearches: []
+    browserSearches: [],
+    systemUnlocked: false,
+    unlockType: null,
+    terminalCommands: [],
+    browserSiteVisits: {},
+    mailsRead: [],
+    mailDraftSent: false,
+    mailDraftContent: '',
+    twitxLoggedIn: false,
+    mailboxLoggedIn: false,
+    twitxDmRead: false,
+    twitxDmSent: false,
+    twitxMessages: [],
+    twitxReplies: [],
+    goalsReached: [],
+    recycleRestored: [],
+    shutdown: false,
+    resonanceMessages: {},
+    resonanceLikes: [],
+    resonancePasses: [],
+    gameResults: { g2048: [], sweep: [], typing: [] }
   };
 
   let lastClickTime = 0;
@@ -192,6 +212,18 @@ window.LD.Logger = (function () {
     logDiaryChronological() {
       log.diaryChronological = true;
       window.LD.Assessment && window.LD.Assessment.update('conscientiousness', 20);
+      // 日記を時系列で全読みした → 行動ベース自動解錠をトリガー
+      document.dispatchEvent(new CustomEvent('ld:auto-unlock', { detail: { type: 'linguistic' } }));
+    },
+
+    logUnlock(type) {
+      log.systemUnlocked = true;
+      log.unlockType = type;
+    },
+
+    logTerminalCommand(cmd) {
+      log.terminalCommands.push({ cmd, time: Date.now() - log.sessionStart });
+      window.LD.Assessment && window.LD.Assessment.update('openness', 0.5);
     },
 
     logBrowserSearch(q) {
@@ -219,6 +251,91 @@ window.LD.Logger = (function () {
         window.LD.Assessment && window.LD.Assessment.update('immersion', 1);
         window.LD.Effects && window.LD.Effects.checkThresholds(log);
       }
+    },
+
+    logBrowserSiteVisit(site) {
+      log.browserSiteVisits[site] = (log.browserSiteVisits[site] || 0) + 1;
+      if (log.browserSiteVisits[site] === 1) {
+        window.LD.Assessment && window.LD.Assessment.update('info_seeking', 8);
+      }
+    },
+
+    logMailRead(mailId) {
+      if (!log.mailsRead.includes(mailId)) {
+        log.mailsRead.push(mailId);
+        window.LD.Assessment && window.LD.Assessment.update('info_seeking', 5);
+        window.LD.Assessment && window.LD.Assessment.update('conscientiousness', 2);
+      }
+    },
+
+    logMailDraftSent(content) {
+      log.mailDraftSent = true;
+      log.mailDraftContent = content;
+      window.LD.Assessment && window.LD.Assessment.update('info_seeking', 20);
+      window.LD.Assessment && window.LD.Assessment.update('openness', 10);
+    },
+
+    logTwitxDmRead() {
+      log.twitxDmRead = true;
+      window.LD.Assessment && window.LD.Assessment.update('info_seeking', 10);
+      window.LD.Assessment && window.LD.Assessment.update('linguistic', 5);
+    },
+
+    logTwitxDmSent(msg) {
+      log.twitxDmSent = true;
+      log.twitxMessages.push(msg);
+      window.LD.Assessment && window.LD.Assessment.update('info_seeking', 20);
+      window.LD.Assessment && window.LD.Assessment.update('linguistic', 10);
+    },
+
+    logTwitxReply(postId, handle, body, watcherReply) {
+      log.twitxReplies.push({ postId, handle, body, watcherReply, time: Date.now() - log.sessionStart });
+      window.LD.Assessment && window.LD.Assessment.update('info_seeking', 8);
+      window.LD.Assessment && window.LD.Assessment.update('linguistic', 5);
+    },
+
+    logTwitXLogin(route) {
+      log.twitxLoggedIn = true;
+      window.LD.Assessment && window.LD.Assessment.update('info_seeking', 15);
+      window.LD.Assessment && window.LD.Assessment.update('integration', 10);
+    },
+
+    logResonanceMessage(profileId, text, reply) {
+      if (!log.resonanceMessages[profileId]) log.resonanceMessages[profileId] = [];
+      log.resonanceMessages[profileId].push({ text, reply });
+      window.LD.Assessment && window.LD.Assessment.update('info_seeking', 5);
+    },
+
+    logGoalReached(goal) {
+      if (!log.goalsReached.includes(goal)) {
+        log.goalsReached.push(goal);
+      }
+    },
+
+    logRecycleRestore(id) {
+      if (!log.recycleRestored.includes(id)) {
+        log.recycleRestored.push(id);
+        window.LD.Assessment && window.LD.Assessment.update('conscientiousness', 5);
+        window.LD.Assessment && window.LD.Assessment.update('immersion', 3);
+      }
+    },
+
+    logShutdown() {
+      log.shutdown = true;
+      window.LD.Assessment && window.LD.Assessment.update('chaos', 10);
+      window.LD.Assessment && window.LD.Assessment.update('immersion', 15);
+    },
+
+    logGame2048(result) {
+      log.gameResults.g2048.push({ ...result, time: Date.now() - log.sessionStart });
+    },
+
+    logGameSweep(result) {
+      log.gameResults.sweep.push({ ...result, time: Date.now() - log.sessionStart });
+    },
+
+    logGameTyping(result) {
+      log.gameResults.typing.push({ ...result, time: Date.now() - log.sessionStart });
     },
 
     getLog() {

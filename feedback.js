@@ -5,6 +5,179 @@ window.LD = window.LD || {};
 window.LD.Feedback = (function () {
 
   // ===========================
+  // タイプ名生成
+  // ===========================
+  function buildTypeName(scores) {
+    const axes = [
+      'chaos', 'openness', 'conscientiousness', 'math',
+      'spatial', 'linguistic', 'integration', 'immersion', 'info_seeking'
+    ];
+    const sorted = axes
+      .map(k => ({ key: k, val: scores[k] || 0 }))
+      .sort((a, b) => b.val - a.val);
+    const top = sorted[0].key;
+    const sub = sorted[1].key;
+
+    const typeTable = {
+      'immersion+linguistic':         { name: '物語の住人',          tagline: '虚構と現実の境界が溶けていく' },
+      'immersion+math':               { name: '没入した計算者',        tagline: '深みの中でも数字は揺れない' },
+      'immersion+info_seeking':       { name: '深淵の探偵',           tagline: '潜れば潜るほど謎が増える' },
+      'immersion+chaos':              { name: '嵐の目の中の観察者',    tagline: '混沌を住み家とした者' },
+      'math+integration':             { name: '設計者',               tagline: '全ては計算通り' },
+      'math+linguistic':              { name: '暗号解読者',            tagline: '言葉の中の論理を見抜く' },
+      'math+conscientiousness':       { name: '几帳面な論理家',        tagline: '手順を踏む者が真実に近づく' },
+      'math+spatial':                 { name: '空間数学者',            tagline: 'パターンは幾何学の中にある' },
+      'linguistic+math':              { name: '言葉の分析者',          tagline: '文章は暗号、文字は数式' },
+      'linguistic+conscientiousness': { name: '丁寧な読書家',          tagline: '見落としは、しない' },
+      'linguistic+openness':          { name: '好奇心旺盛な解読者',    tagline: '意味を問い続ける者' },
+      'linguistic+immersion':         { name: '語り部',                tagline: '記憶の中に真実がある' },
+      'chaos+openness':               { name: '漂流者',                tagline: 'どこへ向かうかは決めない' },
+      'chaos+linguistic':             { name: '静かな観察者',           tagline: '混沌を眺める目' },
+      'chaos+immersion':              { name: '境界の越境者',           tagline: '枠組みそのものを疑う' },
+      'conscientiousness+math':       { name: '体系的探索者',           tagline: '一つひとつ、確実に' },
+      'conscientiousness+linguistic': { name: '几帳面な文書係',         tagline: 'ファイルは全て開かれた' },
+      'conscientiousness+integration':{ name: '綿密な統合者',           tagline: '全ての断片に意味がある' },
+      'spatial+integration':          { name: '空間の設計者',           tagline: '見えない構造を視る' },
+      'spatial+openness':             { name: '視覚の旅人',             tagline: '形が言葉より早く語る' },
+      'info_seeking+linguistic':      { name: '情報の網',               tagline: 'あらゆる声に耳を傾ける' },
+      'info_seeking+integration':     { name: '全知の探偵',             tagline: 'データが揃えば答えが見える' },
+      'info_seeking+openness':        { name: 'アクティブ・コレクター',  tagline: '情報は自ら取りに行くもの' },
+      'integration+math':             { name: '統合思考者',             tagline: '点と点が線になる瞬間を知っている' },
+      'integration+spatial':          { name: '全体像の把握者',         tagline: '森を見て、木も見る' },
+      'openness+chaos':               { name: '未知への挑戦者',         tagline: '答えのない問いを愛する' },
+      'openness+info_seeking':        { name: '探究者',                 tagline: '知ることに終わりはない' },
+    };
+
+    const key1 = `${top}+${sub}`;
+    const key2 = `${sub}+${top}`;
+    return typeTable[key1] || typeTable[key2] || { name: '未分類の探索者', tagline: 'あなたは新しいパターンを描いた' };
+  }
+
+  // ===========================
+  // エンディングメッセージ生成
+  // ===========================
+  function buildEndingMessage(logData, routeOverride) {
+    const goals = logData.goalsReached || [];
+    const unlockType = logData.unlockType || 'none';
+
+    if (routeOverride === 'shutdown') {
+      return {
+        headline: 'あなたは実験を拒否した。',
+        body: 'しかし、この記録はすでに外部サーバーへ転送されています。シャットダウンは——終わりではなかった。'
+      };
+    }
+    if (goals.includes('recycle-restore-all')) {
+      return {
+        headline: '削除されたものが、戻ってきた。',
+        body: 'あなたはXが隠そうとしたものを復元した。断片が揃い、物語の輪郭が見えてきた。'
+      };
+    }
+    if (goals.includes('twitx-reply')) {
+      return {
+        headline: 'あなたはXに返信した。',
+        body: 'その言葉は記録された。@watcher_0 が誰なのかは、まだわからない。でも、あなたの声は届いた。'
+      };
+    }
+    if (goals.includes('mail-report')) {
+      return {
+        headline: '報告書が送信された。',
+        body: '実験の外へ情報を持ち出した。それが何を変えるかは、誰にもわからない。あなたは最初に動いた者だ。'
+      };
+    }
+    if (unlockType === 'composite') {
+      return {
+        headline: '全ての断片が繋がった。',
+        body: 'Xの実験の全貌が見えた。それは、あなたを被験者にするための罠だったのか——それとも、あなたを解放するための地図だったのか。'
+      };
+    }
+    if (unlockType === 'linguistic') {
+      return {
+        headline: '言葉の中に真実があった。',
+        body: 'あなたは文字の行間を読んだ。Xが日記に残したパターンに気づいた者だけが、この扉を開けられる。'
+      };
+    }
+    if (unlockType === 'math') {
+      return {
+        headline: 'パターンは嘘をつかない。',
+        body: '数字の規則性があなたを導いた。感情ではなく論理——それがXの設計した「正解」だった。'
+      };
+    }
+    if (unlockType === 'visual') {
+      return {
+        headline: '色が、鍵だった。',
+        body: '画面上に散らばった視覚情報を繋いだ。あなたの目は、言葉より速く真実を見抜いた。'
+      };
+    }
+    return {
+      headline: 'システムは記録を完了した。',
+      body: 'あなたの行動のすべてが、データとして残されている。Xが設計したこの実験は——今も続いている。'
+    };
+  }
+
+  // ===========================
+  // 行動タイムライン生成
+  // ===========================
+  function buildTimeline(logData) {
+    const events = [];
+
+    if (logData.fileOpenOrder && logData.fileOpenOrder.length > 0) {
+      logData.fileOpenOrder.forEach(f => {
+        events.push({ time: f.time, label: `「${f.name}」を開いた` });
+      });
+    }
+
+    if (logData.browserSearches && logData.browserSearches.length > 0) {
+      logData.browserSearches.slice(0, 3).forEach(s => {
+        events.push({ time: s.time, label: `「${s.q.slice(0, 20)}」を検索した` });
+      });
+    }
+
+    if (logData.twitxDmSent) {
+      events.push({ time: (logData.twitxMessages || []).length * 1000, label: 'TwitXでメッセージを送信した' });
+    }
+
+    if (logData.mailDraftSent) {
+      events.push({ time: 0, label: '外部への報告書を送信した' });
+    }
+
+    if (logData.goalsReached) {
+      logData.goalsReached.forEach(g => {
+        const labels = {
+          'twitx-reply':         '@watcher_0 に返信した',
+          'mail-report':         '報告書を送信した',
+          'recycle-restore-all': '全削除ファイルを復元した',
+          'shutdown':            'シャットダウンを実行した'
+        };
+        if (labels[g]) events.push({ time: 99999999, label: `[ゴール] ${labels[g]}` });
+      });
+    }
+
+    if (logData.systemUnlocked && logData.unlockType) {
+      const routeNames = {
+        composite: '複合ルート', linguistic: '言語ルート',
+        math: '数理ルート', visual: '視覚ルート'
+      };
+      events.push({ time: 99999990, label: `[解錠] ${routeNames[logData.unlockType] || logData.unlockType}でシステムフォルダを解錠` });
+    }
+
+    events.sort((a, b) => a.time - b.time);
+
+    if (events.length === 0) return '<div style="color:#999;font-size:11px;">行動記録がありません。</div>';
+
+    return events.map(ev => {
+      const ms = ev.time;
+      const min = Math.floor(ms / 60000);
+      const sec = Math.floor((ms % 60000) / 1000);
+      const timeStr = min > 0 ? `${min}:${String(sec).padStart(2,'0')}` : `0:${String(sec).padStart(2,'0')}`;
+      const isGoal = ev.label.startsWith('[');
+      return `<div class="fb-timeline-item ${isGoal ? 'fb-timeline-goal' : ''}">
+        <span class="fb-timeline-time">${timeStr}</span>
+        <span class="fb-timeline-label">${ev.label}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ===========================
   // パーソナリティ評価文生成
   // ===========================
   function buildProfiles(scores) {
@@ -48,6 +221,11 @@ window.LD.Feedback = (function () {
         [70, '深', '物語世界に完全に引き込まれていました。隠しフォルダへの挑戦がその証拠です。'],
         [40, '中', '一定の没入感を保ちながらも、どこかで「これは体験だ」という冷静さも持ち合わせていました。'],
         [ 0, '浅', '観察者の立場を保ちながら、客観的に体験を楽しみました。']
+      ]),
+      buildProfile('情報収集力', scores.info_seeking, [
+        [70, '高', 'SNS・メール・ニュースと多様な情報源を横断しました。人や社会との繋がりの中に手がかりを求める、アクティブな情報収集者です。'],
+        [40, '中', 'いくつかの外部情報に目を向けました。必要と感じた情報を適切に取りに行く、実用的なスタイルです。'],
+        [ 0, '低', 'ブラウザをあまり使わず、手元の情報だけで探索を進めました。外部への依存なく自己完結できるタイプです。']
       ])
     ];
   }
@@ -122,6 +300,97 @@ window.LD.Feedback = (function () {
   }
 
   // ===========================
+  // ゲーム行動タブ生成
+  // ===========================
+  function buildGameTab(logData) {
+    const gr = (logData.gameResults) || { g2048: [], sweep: [], typing: [] };
+    const played2048  = gr.g2048.length  > 0;
+    const playedSweep = gr.sweep.length  > 0;
+    const playedTyp   = gr.typing.length > 0;
+
+    if (!played2048 && !playedSweep && !playedTyp) {
+      return '<div class="fb-game-empty">ゲームを1つもプレイしていません。</div>';
+    }
+
+    let html = '';
+
+    // 2048セクション
+    if (played2048) {
+      const best = gr.g2048.reduce((a, r) => r.score > a.score ? r : a, gr.g2048[0]);
+      const avg  = Math.round(gr.g2048.reduce((a, r) => a + r.score, 0) / gr.g2048.length);
+      const eff  = best.moveCount > 0 ? Math.round(best.score / best.moveCount) : 0;
+      const won  = gr.g2048.some(r => r.won);
+      html += `
+        <div class="fb-game-section">
+          <div class="fb-game-title">🔢 2048</div>
+          <div class="fb-game-meta">プレイ回数: ${gr.g2048.length}回</div>
+          <div class="fb-game-stats-grid">
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${best.score.toLocaleString()}</div><div class="fb-game-stat-lbl">最高スコア</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${best.bestTile}</div><div class="fb-game-stat-lbl">最大タイル</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${best.moveCount}</div><div class="fb-game-stat-lbl">最多手数</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${eff}</div><div class="fb-game-stat-lbl">手数効率</div></div>
+          </div>
+          <div class="fb-game-analysis">
+            ${won ? '<div class="fb-game-badge fb-badge-win">2048達成</div>' : ''}
+            ${eff > 100 ? '<p>手数あたりのスコアが高い。無駄のない操作スタイルです。</p>' : eff > 40 ? '<p>手堅く着実に得点を重ねるスタイルでした。</p>' : '<p>試行錯誤しながら手を探る、実験的な操作スタイルでした。</p>'}
+            ${avg < best.score * 0.5 ? '<p>回によってスコアのムラが大きく、アプローチを都度変えていたことが伺えます。</p>' : ''}
+          </div>
+        </div>`;
+    }
+
+    // マインスイーパーセクション
+    if (playedSweep) {
+      const best  = gr.sweep.reduce((a, r) => r.elapsed > 0 && (a.elapsed === 0 || r.elapsed < a.elapsed) ? r : a, gr.sweep[0]);
+      const won   = gr.sweep.some(r => r.won);
+      const avgFR = Math.round(gr.sweep.reduce((a, r) => a + r.flagRatio, 0) / gr.sweep.length);
+      const wc    = gr.sweep.reduce((a, r) => a + r.wildClicks, 0);
+      html += `
+        <div class="fb-game-section">
+          <div class="fb-game-title">💣 マインスイーパー</div>
+          <div class="fb-game-meta">プレイ回数: ${gr.sweep.length}回</div>
+          <div class="fb-game-stats-grid">
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${best.elapsed}s</div><div class="fb-game-stat-lbl">最短タイム</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${avgFR}%</div><div class="fb-game-stat-lbl">平均フラグ率</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${wc}</div><div class="fb-game-stat-lbl">無フラグ連打</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${won ? '✓' : '✗'}</div><div class="fb-game-stat-lbl">クリア</div></div>
+          </div>
+          <div class="fb-game-analysis">
+            ${won ? '<div class="fb-game-badge fb-badge-win">クリア達成</div>' : ''}
+            ${avgFR >= 60 ? '<p>フラグを積極的に使い、地雷を先に特定してから進む慎重な戦略。</p>' : avgFR >= 30 ? '<p>フラグと直感を組み合わせた中間スタイル。</p>' : '<p>フラグをほとんど使わず直感で開いていく、大胆な進め方でした。</p>'}
+            ${wc > 5 ? '<p>フラグなしでの連続クリックが多く、リスクを厭わない行動傾向が見られます。</p>' : ''}
+          </div>
+        </div>`;
+    }
+
+    // タイピングセクション
+    if (playedTyp) {
+      const last  = gr.typing[gr.typing.length - 1];
+      const best  = gr.typing.reduce((a, r) => r.avgWPM > a.avgWPM ? r : a, gr.typing[0]);
+      const wpmVar = last.rounds && last.rounds.length > 1
+        ? Math.round(Math.sqrt(last.rounds.reduce((a, r) => a + Math.pow(r.wpm - last.avgWPM, 2), 0) / last.rounds.length))
+        : 0;
+      html += `
+        <div class="fb-game-section">
+          <div class="fb-game-title">⌨️ タイピング</div>
+          <div class="fb-game-meta">プレイ回数: ${gr.typing.length}回</div>
+          <div class="fb-game-stats-grid">
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${best.avgWPM}</div><div class="fb-game-stat-lbl">最高WPM</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${last.accuracy}%</div><div class="fb-game-stat-lbl">最終精度</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${last.totalErrors || 0}</div><div class="fb-game-stat-lbl">総ミス数</div></div>
+            <div class="fb-game-stat"><div class="fb-game-stat-val">${wpmVar}</div><div class="fb-game-stat-lbl">WPMムラ</div></div>
+          </div>
+          <div class="fb-game-analysis">
+            ${best.avgWPM >= 80 ? '<div class="fb-game-badge fb-badge-win">高速タイパー</div>' : ''}
+            ${last.accuracy >= 95 ? '<p>非常に高い精度。ミスを丁寧に修正しながら打つ、完璧主義的なスタイル。</p>' : last.accuracy >= 80 ? '<p>スピードと精度のバランスを取りながら入力していました。</p>' : '<p>スピード優先で打ち間違いを気にしない、勢いのある入力スタイル。</p>'}
+            ${wpmVar > 20 ? '<p>文章ごとにペースが大きく変動。得意な入力パターンとそうでないものが分かれています。</p>' : wpmVar > 5 ? '<p>安定したリズムで入力していました。' : '<p>各文章をほぼ均一なペースでこなす、一定のリズム感があります。</p>'}
+          </div>
+        </div>`;
+    }
+
+    return html;
+  }
+
+  // ===========================
   // レーダーチャート描画
   // ===========================
   function drawRadar(canvas, scores) {
@@ -129,18 +398,10 @@ window.LD.Feedback = (function () {
     const W = canvas.width, H = canvas.height;
     const cx = W / 2, cy = H / 2;
     const R  = Math.min(cx, cy) - 48;
-    const N  = 8;
-    const labels = ['カオス耐性', '知的開放性', '系統的探索', '数理思考', '空間・視覚', '言語・文脈', '情報統合力', '没入深度'];
-    const values = [
-      scores.chaos             / 100,
-      scores.openness          / 100,
-      scores.conscientiousness / 100,
-      scores.math              / 100,
-      scores.spatial           / 100,
-      scores.linguistic        / 100,
-      scores.integration       / 100,
-      scores.immersion         / 100
-    ];
+    const labels = ['カオス耐性', '知的開放性', '系統的探索', '論理・数理', '空間認知', '言語理解', '情報統合', '没入深度', '情報収集'];
+    const keys   = ['chaos', 'openness', 'conscientiousness', 'math', 'spatial', 'linguistic', 'integration', 'immersion', 'info_seeking'];
+    const N = 9;
+    const values = keys.map(k => (scores[k] || 0) / 100);
 
     ctx.clearRect(0, 0, W, H);
 
@@ -194,13 +455,13 @@ window.LD.Feedback = (function () {
     }
 
     // ラベル
-    ctx.font      = '11px "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+    ctx.font      = '10px "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
     ctx.fillStyle = '#334155';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     for (let i = 0; i < N; i++) {
       const a = (i / N) * Math.PI * 2 - Math.PI / 2;
-      const r = R + 34;
+      const r = R + 32;
       ctx.fillText(labels[i], cx + r * Math.cos(a), cy + r * Math.sin(a));
     }
   }
@@ -231,7 +492,7 @@ window.LD.Feedback = (function () {
   }
 
   return {
-    show(logData, isShortcut = false) {
+    show(logData, isShortcut = false, routeOverride = null) {
       // 暗転divを削除しておく（演出の残骸が残らないように）
       document.querySelectorAll('div[style*="z-index: 9700"]').forEach(el => el.remove());
 
@@ -240,7 +501,6 @@ window.LD.Feedback = (function () {
         const reportIcon = document.getElementById('analysis-report');
         if (reportIcon) {
           reportIcon.style.display = 'flex';
-          // 少し光らせる演出
           reportIcon.classList.add('icon-glow');
           setTimeout(() => reportIcon.classList.remove('icon-glow'), 5000);
         }
@@ -250,7 +510,7 @@ window.LD.Feedback = (function () {
       try {
         scores = window.LD.Assessment.calculateFinal(logData);
       } catch(e) {
-        scores = { chaos: 50, openness: 30, conscientiousness: 30, math: 30, spatial: 30, linguistic: 30, integration: 30, immersion: 20, frustration: 0 };
+        scores = { chaos: 50, openness: 30, conscientiousness: 30, math: 30, spatial: 30, linguistic: 30, integration: 30, immersion: 20, info_seeking: 20, frustration: 0 };
       }
 
       let profiles, narrative;
@@ -269,6 +529,25 @@ window.LD.Feedback = (function () {
       const frustPct    = Math.min(100, Math.round(frustration));
       const unlockType  = logData.unlockType || 'none';
 
+      const typeInfo  = buildTypeName(scores);
+      const endingMsg = buildEndingMessage(logData, routeOverride);
+      const timeline  = buildTimeline(logData);
+      const gameTab   = buildGameTab(logData);
+
+      const goalsReached = logData.goalsReached || [];
+      const goalBadges = [
+        ...(logData.systemUnlocked ? [`<div class="fb-goal-badge fb-goal-unlock">🔓 システム解錠 (${logData.unlockType || '?'})</div>`] : []),
+        ...goalsReached.map(g => {
+          const labels = {
+            'twitx-reply':         '💬 Xへの返信',
+            'mail-report':         '📧 外部報告',
+            'recycle-restore-all': '🗑️ 全ファイル復元',
+            'shutdown':            '⏻ シャットダウン'
+          };
+          return `<div class="fb-goal-badge">${labels[g] || g}</div>`;
+        })
+      ].join('');
+
       screen.innerHTML = `
         <div id="fb-wrap">
           <div id="fb-header">
@@ -276,58 +555,86 @@ window.LD.Feedback = (function () {
             <div id="fb-subtitle">— Behavioral Assessment Report —</div>
           </div>
 
-          <div id="fb-body">
-            <div id="fb-left">
-              <section class="fb-section">
-                <h2 class="fb-section-title">▎ あなたの探索の軌跡</h2>
-                <div id="fb-narrative">${narrative.replace(/\n/g, '<br>')}</div>
-              </section>
-              <section class="fb-section">
-                <h2 class="fb-section-title">▎ パーソナリティ診断</h2>
-                <div id="fb-profiles">
-                  ${profiles.map(p => `
-                    <div class="fb-profile">
-                      <div class="fb-profile-head">
-                        <span class="fb-profile-label">${p.label}</span>
-                        <span class="fb-grade ${buildGradeClass(p.grade)}">${p.grade}</span>
-                        <span class="fb-score-val">${Math.round(p.score)}</span>
+          <div id="fb-type-banner">
+            <div id="fb-type-name">${typeInfo.name}</div>
+            <div id="fb-type-tagline">${typeInfo.tagline}</div>
+          </div>
+
+          <div id="fb-ending-msg">
+            <div id="fb-ending-headline">${endingMsg.headline}</div>
+            <div id="fb-ending-body">${endingMsg.body}</div>
+          </div>
+
+          <div id="fb-tabs">
+            <button class="fb-tab fb-tab-active" data-tab="overview">📊 総合分析</button>
+            <button class="fb-tab" data-tab="games">🎮 ゲーム行動</button>
+          </div>
+
+          <div id="fb-tab-overview" class="fb-tab-panel">
+            <div id="fb-body">
+              <div id="fb-left">
+                <section class="fb-section">
+                  <h2 class="fb-section-title">▎ 行動タイムライン</h2>
+                  <div id="fb-timeline">${timeline}</div>
+                </section>
+                <section class="fb-section">
+                  <h2 class="fb-section-title">▎ パーソナリティ診断</h2>
+                  <div id="fb-profiles">
+                    ${profiles.map(p => `
+                      <div class="fb-profile">
+                        <div class="fb-profile-head">
+                          <span class="fb-profile-label">${p.label}</span>
+                          <span class="fb-grade ${buildGradeClass(p.grade)}">${p.grade}</span>
+                          <span class="fb-score-val">${Math.round(p.score)}</span>
+                        </div>
+                        <div class="fb-bar-wrap"><div class="fb-bar" style="width:${Math.round(p.score)}%"></div></div>
+                        <div class="fb-profile-desc">${p.desc}</div>
                       </div>
-                      <div class="fb-bar-wrap"><div class="fb-bar" style="width:${Math.round(p.score)}%"></div></div>
-                      <div class="fb-profile-desc">${p.desc}</div>
-                    </div>
-                  `).join('')}
-                </div>
-              </section>
-            </div>
-
-            <div id="fb-right">
-              <section class="fb-section">
-                <h2 class="fb-section-title">▎ 5軸分析レーダー</h2>
-                <canvas id="radar-canvas" width="300" height="300"></canvas>
-              </section>
-
-              <section class="fb-section">
-                <h2 class="fb-section-title">▎ ストレス・苛立ち指数</h2>
-                <div class="fb-frustration-wrap">
-                  <div class="fb-frustration-bar-bg">
-                    <div class="fb-frustration-bar" style="width:${frustPct}%"></div>
+                    `).join('')}
                   </div>
-                  <div class="fb-frustration-label">${getFrustrationText(frustration)}</div>
-                </div>
-              </section>
+                </section>
+              </div>
 
-              <section class="fb-section">
-                <h2 class="fb-section-title">▎ 解読ルート</h2>
-                <div class="fb-route-badge">
-                  ${getRouteLabel(unlockType)}
-                </div>
-              </section>
+              <div id="fb-right">
+                <section class="fb-section">
+                  <h2 class="fb-section-title">▎ 9軸分析レーダー</h2>
+                  <canvas id="radar-canvas" width="300" height="300"></canvas>
+                </section>
+
+                <section class="fb-section">
+                  <h2 class="fb-section-title">▎ ストレス・苛立ち指数</h2>
+                  <div class="fb-frustration-wrap">
+                    <div class="fb-frustration-bar-bg">
+                      <div class="fb-frustration-bar" style="width:${frustPct}%"></div>
+                    </div>
+                    <div class="fb-frustration-label">${getFrustrationText(frustration)}</div>
+                  </div>
+                </section>
+
+                <section class="fb-section">
+                  <h2 class="fb-section-title">▎ 達成ゴール</h2>
+                  <div id="fb-goals">
+                    ${goalsReached.length === 0 && !logData.systemUnlocked
+                      ? '<div style="color:#999;font-size:11px;">ゴール未達成</div>'
+                      : goalBadges
+                    }
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
 
+          <div id="fb-tab-games" class="fb-tab-panel" style="display:none">
+            <div id="fb-game-body">${gameTab}</div>
+          </div>
+
           <div id="fb-meta">
-            <p>このシステムそのものが、被験者Xの設計した実験でした。</p>
-            <p>あなたは今、実験の被験者として記録されました。</p>
+            ${routeOverride === 'shutdown'
+              ? `<p>あなたはシャットダウンを選んだ。</p>
+                 <p>しかし記録は残った。実験は、あなたの意志とは無関係に継続されます。</p>`
+              : `<p>このシステムそのものが、被験者Xの設計した実験でした。</p>
+                 <p>あなたは今、実験の被験者として記録されました。</p>`
+            }
             <p class="fb-meta-small">— Project LD Ver.2.1 —</p>
           </div>
 
@@ -351,6 +658,23 @@ window.LD.Feedback = (function () {
 
         const replayBtn = document.getElementById('fb-replay-btn');
         if (replayBtn) replayBtn.addEventListener('click', () => location.reload());
+
+        // タブ切り替え
+        screen.querySelectorAll('.fb-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            screen.querySelectorAll('.fb-tab').forEach(b => b.classList.remove('fb-tab-active'));
+            btn.classList.add('fb-tab-active');
+            const target = btn.dataset.tab;
+            screen.querySelectorAll('.fb-tab-panel').forEach(p => {
+              p.style.display = p.id === `fb-tab-${target}` ? '' : 'none';
+            });
+            // ゲームタブ→概要タブに戻ったときレーダー再描画
+            if (target === 'overview') {
+              const c = document.getElementById('radar-canvas');
+              if (c) drawRadar(c, scores);
+            }
+          });
+        });
       }, 150);
     }
   };

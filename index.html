@@ -33,6 +33,17 @@
     <!-- 付箋エリア -->
     <div id="sticky-area"></div>
 
+    <!-- スタートメニュー -->
+    <div id="start-menu" class="hidden">
+      <div class="sm-header">Project LD OS</div>
+      <div class="sm-items">
+        <div class="sm-item" data-action="settings"><span>⚙️</span> 設定</div>
+        <div class="sm-item" data-action="terminal"><span>🖥️</span> ターミナル</div>
+        <div class="sm-sep"></div>
+        <div class="sm-item" data-action="shutdown"><span>⏻</span> シャットダウン</div>
+      </div>
+    </div>
+
     <!-- ウィンドウコンテナ -->
     <div id="win-container"></div>
 
@@ -49,35 +60,11 @@
        タスクバー
        ======================== -->
   <div id="taskbar">
+    <button id="start-btn">⊞ スタート</button>
     <div id="taskbar-items"></div>
-    <div id="clock">00:00</div>
-  </div>
-
-  <!-- ========================
-       パスワードモーダル
-       ========================  <!-- 隠しフォルダ コンソール (Stealth UI) -->
-  <div id="pw-modal" class="hidden">
-    <div id="pw-dialog">
-      <div class="pw-titlebar">Archive Extractor (Error 0x8A99)</div>
-      <div class="pw-body">
-        <div class="pw-label">破損したアーカイブを展開するためのデータフラグメントを入力してください。</div>
-        <div class="pw-fragments">
-          <div class="pw-fragment-row">
-            <span>Fragment 1:</span><input type="text" id="pw-frag1" autocomplete="off" spellcheck="false" />
-          </div>
-          <div class="pw-fragment-row">
-            <span>Fragment 2:</span><input type="text" id="pw-frag2" autocomplete="off" spellcheck="false" />
-          </div>
-          <div class="pw-fragment-row">
-            <span>Fragment 3:</span><input type="text" id="pw-frag3" autocomplete="off" spellcheck="false" />
-          </div>
-        </div>
-        <div id="pw-error" class="hidden">フラグメントのハッシュが一致しません。</div>
-        <div class="pw-btns">
-          <button class="pw-btn pw-btn-ok" id="pw-ok">マウント</button>
-          <button class="pw-btn" id="pw-cancel">キャンセル</button>
-        </div>
-      </div>
+    <div id="taskbar-right">
+      <div id="taskbar-notif"></div>
+      <div id="clock">00:00</div>
     </div>
   </div>
 

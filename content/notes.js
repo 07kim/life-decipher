@@ -109,6 +109,18 @@ window.LD.STICKY_NOTES = [
     rotation: -0.9
   },
 
+  // ━━ 言語ルート（W.A.K.E.アクロスティック）ヒント ━━
+  {
+    id: 'note-hint-lang',
+    type: 'yellow',
+    text: '各行の\n最初の文字だけを\n読んでみろ',
+    color: '#fef9c3',
+    shadowColor: 'rgba(202,138,4,0.3)',
+    x: 140,
+    y: 430,
+    rotation: 1.5
+  },
+
   // ━━ 空間・視覚ルート（勘合符パズル） ━━
   {
     id: 'kango1', type: 'blue', text: '何か足りない', color: '#bae6fd', shadowColor: 'rgba(50,100,180,0.2)', x: 120, y: 350, rotation: -2.8,
